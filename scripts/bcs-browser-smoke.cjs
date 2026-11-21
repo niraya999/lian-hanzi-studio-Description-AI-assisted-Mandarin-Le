@@ -44,6 +44,34 @@ const assert = require('node:assert/strict');
     assert.equal(await desktop.locator('#bcs').isVisible(), true, 'Desktop BCS must be visible');
     assert.equal(await desktop.locator('#bcsGallery').isVisible(), true, 'Desktop deity gallery must be visible');
     assert.ok(navigations.every(url => !url.includes('buddhist-content-studio.mrtnhasen.chatgpt.site')), 'BCS must remain inside LHS');
+    // Mock read-only Drive data: deterministic UI coverage without external OAuth.
+    await desktop.evaluate(() => {
+      const folders = {
+        root: [{id:'tara',name:'Green Tara',mimeType:'application/vnd.google-apps.folder'}],
+        tara: [
+          {id:'image1',name:'cover.png',mimeType:'image/png'},
+          {id:'video1',name:'teaser.mp4',mimeType:'video/mp4'},
+          {id:'text1',name:'notes.txt',mimeType:'text/plain'},
+          {id:'nested',name:'Research',mimeType:'application/vnd.google-apps.folder'}
+        ],
+        nested: [{id:'note2',name:'detail.txt',mimeType:'text/plain'}]
+      };
+      window.lhsBcsDrive.connected = () => true;
+      window.lhsBcsDrive.list = async id => folders[id === '16E4O7n0oVTVOXqXg4ff_Vz6TxK-qdJv1' ? 'root' : id] || [];
+      window.lhsBcsDrive.blob = async id => new Blob([id === 'text1' ? 'Tara research notes' : 'sample'], {type:id === 'text1' ? 'text/plain':'image/png'});
+      window.lhsBcsGallery.refresh();
+    });
+    await desktop.getByRole('button', { name: 'Green Tara' }).click();
+    for (const heading of ['Images (1)','Videos (1)','Text & documents (1)','Folders (1)']) {
+      await desktop.locator('#bcsGallery').getByRole('heading', { name: heading }).waitFor();
+    }
+    await desktop.getByRole('button', { name: 'notes.txt' }).click();
+    await desktop.getByText('Tara research notes').waitFor();
+    await desktop.getByRole('button', { name: 'Back to Green Tara' }).click();
+    await desktop.getByRole('button', { name: 'Research' }).click();
+    await desktop.getByRole('button', { name: 'detail.txt' }).waitFor();
+    await desktop.getByRole('button', { name: 'All deities' }).click();
+    await desktop.getByRole('button', { name: 'Green Tara' }).waitFor();
     await desktop.screenshot({ path: '/tmp/lhs-bcs-desktop.png', fullPage: true });
 
     console.log('Mobile and desktop BCS navigation smoke tests passed');
