@@ -22,7 +22,7 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p dist/bcs
-          cp bcs/bcs-native.js dist/bcs/
+          cp bcs/bcs-native.js bcs/deity-gallery.js dist/bcs/
           cp index.html word-of-the-day.js verified-words.js sw.js manifest.webmanifest icon.svg landscape.svg CNAME dist/
           python3 scripts/stamp-build.py --html dist/index.html --commit "$(git rev-parse HEAD)" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           grep -q 'Lian Hanzi Studio' dist/index.html
