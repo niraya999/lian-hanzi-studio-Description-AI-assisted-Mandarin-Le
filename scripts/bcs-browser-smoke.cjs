@@ -30,6 +30,18 @@ const assert = require('node:assert/strict');
     }
     assert.deepEqual(errors, [], 'Unexpected browser errors');
     await page.screenshot({ path: '/tmp/lhs-bcs-mobile.png', fullPage: true });
-    console.log('Mobile BCS and navigation smoke tests passed');
+    const desktop = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    const navigations = [];
+    desktop.on('framenavigated', frame => {
+      if (frame === desktop.mainFrame()) navigations.push(frame.url());
+    });
+    await desktop.goto('http://127.0.0.1:8765/', { waitUntil: 'domcontentloaded' });
+    await desktop.locator('nav [data-tab="bcs"]').click();
+    assert.equal(await desktop.locator('#bcs').isVisible(), true, 'Desktop BCS must be visible');
+    assert.equal(await desktop.locator('#bcsRoot [data-view="Studio"]').getAttribute('aria-selected'), 'true');
+    assert.ok(navigations.every(url => !url.includes('buddhist-content-studio.mrtnhasen.chatgpt.site')), 'BCS must remain inside LHS');
+    await desktop.screenshot({ path: '/tmp/lhs-bcs-desktop.png', fullPage: true });
+
+    console.log('Mobile and desktop BCS navigation smoke tests passed');
   } finally { await browser.close(); }
 })().catch(err => { console.error(err); process.exitCode = 1; });
