@@ -41,10 +41,12 @@ Screenshots were inspected in the browser session; they are not committed as ima
 
 ## Verification and release readiness
 
-- JavaScript syntax compilation: pass for the new BCS script.
-- Repository build/test suite: not run; repository is a static HTML PWA with no package/build configuration observed.
-- Browser end-to-end test of this feature branch: not available because the feature branch is not deployed to a staging URL.
-- PWA asset precache: updated to include the new BCS script; deployment and service worker update still need staging/production verification.
-- Music and Mandarin functions remain in the original HTML/scripts, but full regression testing was not performed.
-- Google Drive access requires the user's authorized LHS Google OAuth session. TikTok functionality is unavailable.
-- Deployment readiness: **not ready for production acceptance** until staging browser checks cover desktop/mobile navigation, Drive browsing, Music/Learn/settings regressions, and PWA update behavior.
+- GitHub Actions preview build and browser smoke tests passed through commit `07a0701`.
+- Chromium mobile (390 × 844): five BCS views, project creation, asset reference editing, local draft persistence after reload, and LHS Library/Learn/Settings navigation passed.
+- Chromium desktop (1440 × 900): native BCS tab opens without navigating to the external BCS website.
+- Browser screenshots are uploaded as GitHub Actions artifacts for review.
+- JavaScript syntax, static integration checks, and preview packaging passed.
+- Service worker BCS script URL and page script version were aligned in commit `3811db9`; that new commit still requires CI confirmation.
+- Google Drive OAuth, actual Drive browsing with a signed-in account, Music playback, Android hardware, and service worker upgrade behavior are **not yet verified end-to-end**.
+- The BCS module is a local-draft reconstruction, not the original application/backend. There is no cross-device project sync or TikTok scheduling/publishing.
+- Production acceptance requires explicit approval of these limitations and a post-deployment smoke test. Keep this PR in Draft until that decision.
