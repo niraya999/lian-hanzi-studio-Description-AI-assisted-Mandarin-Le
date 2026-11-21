@@ -61,7 +61,7 @@ jobs:
                   file = Path(tmp) / f'inline-{i}.js'
                   file.write_text(script)
                   subprocess.run(['node','--check',str(file)],check=True)
-          for path in ('bcs/bcs-native.js','sw.js','word-of-the-day.js','verified-words.js'):
+          for path in ('bcs/bcs-native.js','bcs/deity-gallery.js','sw.js','word-of-the-day.js','verified-words.js'):
               subprocess.run(['node','--check',path],check=True)
           print('BCS integration and JavaScript syntax checks passed')
           PY
