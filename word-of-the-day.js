@@ -22,7 +22,7 @@ function render(){const root=$('dailyWord');if(!root)return;const today=selected
 const el=(tag,cls,text)=>{const x=document.createElement(tag);if(cls)x.className=cls;if(text)x.textContent=text;return x};
 root.append(el('div','daily-hanzi',today.word),el('div','daily-pinyin',window.pinyinPro?.pinyin(today.word,{toneType:'symbol'})||'Pinyin tidak tersedia'),el('div','daily-meaning',today.meaning),el('p','daily-lyric',today.line),el('p','daily-source','Sumber: '+today.title));
 const actions=el('div','daily-actions');const audio=el('button','','▶ Dengarkan kata');audio.onclick=()=>speak(today.word);actions.append(audio);
-const source=el('button','','Buka lagu sumber');source.onclick=()=>{window.showTab('library');$('driveStatus').textContent='Cari lagu: '+today.title+' di Music Library.'};actions.append(source);root.append(actions);
+const source=el('button','','Buka lagu sumber');source.onclick=()=>{if(typeof window.lhsOpenTrack==='function')window.lhsOpenTrack(today.trackId,today.title);else window.showTab('library')};actions.append(source);root.append(actions);
 const history=$('wordHistory');history.replaceChildren();for(let day=-1;day>=-7;day--){const item=selected(day);if(!item)continue;const row=el('div','daily-history-row',dateKey(day)+' · '+item.word+' · '+item.meaning);history.append(row)}
 }
 window.lhsCaptureLyrics=(id,title,lyrics,url)=>{if(!id||!hanLines(lyrics).length)return;const tracks=getTracks().filter(t=>t.id!==id);tracks.push({id,title:String(title),lyrics:String(lyrics).slice(0,80000),url:String(url||'')});try{localStorage.setItem(KEY,JSON.stringify(tracks.slice(-MAX_TRACKS)))}catch(e){console.warn('Word of the Day cache unavailable',e)}render()};
