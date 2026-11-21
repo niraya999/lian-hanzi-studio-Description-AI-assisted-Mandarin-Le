@@ -1,0 +1,33 @@
+name: Deploy Lian Universe Hub
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Prepare site
+        run: |
+          mkdir -p dist
+          cp index.html word-of-the-day.js verified-words.js sw.js manifest.webmanifest icon.svg landscape.svg CNAME dist/
+          python3 scripts/stamp-build.py --html dist/index.html --commit "$(git rev-parse HEAD)" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          grep -q 'Lian Universe Hub' dist/index.html
+          grep -q 'buddhist-content-studio.mrtnhasen.chatgpt.site' dist/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
