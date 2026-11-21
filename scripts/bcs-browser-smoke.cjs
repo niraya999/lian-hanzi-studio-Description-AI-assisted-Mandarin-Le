@@ -71,7 +71,7 @@ const assert = require('node:assert/strict');
           {id:'video1',name:'teaser.mp4',mimeType:'video/mp4'},
           {id:'text1',name:'notes.txt',mimeType:'text/plain'},
           {id:'nested',name:'Research',mimeType:'application/vnd.google-apps.folder'}
-        ] : [];
+        ] : id === 'nested' ? [{id:'note2',name:'detail.txt',mimeType:'text/plain'}] : [];
       window.dispatchEvent(new Event('lhs-drive-connected'));
     });
     await desktop.getByRole('button', { name: 'Maitreya' }).waitFor();
