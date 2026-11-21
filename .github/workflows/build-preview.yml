@@ -1,0 +1,47 @@
+name: LHS Build Preview
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Validate source assets
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          html = Path('index.html').read_text()
+          js = Path('word-of-the-day.js').read_text()
+          sw = Path('sw.js').read_text()
+          assert 'id="buildCommit"' in html
+          assert 'id="learn"' in html
+          assert 'lhsCaptureLyrics?.(id,name,lyrics,url)' in html
+          assert 'word-of-the-day.js' in html and 'word-of-the-day.js' in sw
+          assert "timeZone:'Asia/Jakarta'" in js
+          print('Static source checks passed')
+          PY
+      - name: Stage build artifact and embed source commit
+        run: |
+          export SOURCE_SHA="$(git rev-parse HEAD)"
+          echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
+          mkdir -p dist
+          cp index.html word-of-the-day.js sw.js manifest.webmanifest icon.svg landscape.svg dist/
+          python3 scripts/stamp-build.py --html dist/index.html --commit "$SOURCE_SHA" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          html = Path('dist/index.html').read_text()
+          assert f'name="lhs-commit" content="{os.environ["SOURCE_SHA"]}"' in html
+          assert 'name="lhs-build-date" content="20' in html
+          print('Build metadata verified')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lhs-preview-${{ github.sha }}
+          path: dist/
+          if-no-files-found: error
