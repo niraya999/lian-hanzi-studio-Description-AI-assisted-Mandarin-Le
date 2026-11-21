@@ -8,6 +8,9 @@ const assert = require('node:assert/strict');
     page.on('pageerror', e => errors.push(e.message));
     await page.goto('http://127.0.0.1:8765/', { waitUntil: 'domcontentloaded' });
     await page.locator('nav [data-tab="bcs"]').click();
+    await page.locator('#bcsGallery').waitFor();
+    assert.equal(await page.locator('#bcsGallery').isVisible(), true);
+    await page.locator('#bcsGallery').getByRole('button', { name: 'Studio editor' }).click();
     await page.locator('#bcsRoot [data-view="Studio"]').waitFor();
     for (const section of ['Studio', 'Calendar', 'Asset library', 'Sources', 'Connected accounts']) {
       await page.locator('#bcsRoot [data-view="' + section + '"]').click();
@@ -22,6 +25,7 @@ const assert = require('node:assert/strict');
     await page.locator('#bcsRoot [data-action="save"]').click();
     await page.reload({ waitUntil: 'domcontentloaded' });
     await page.locator('nav [data-tab="bcs"]').click();
+    await page.locator('#bcsGallery').getByRole('button', { name: 'Studio editor' }).click();
     await page.locator('#bcsRoot [data-project]').filter({ hasText: 'Smoke Test Project' }).click();
     assert.equal(await page.locator('#bcsRoot [data-field="rawImage"]').inputValue(), 'https://example.com/image');
     for (const tab of ['library', 'learn', 'settings', 'bcs']) {
@@ -38,7 +42,7 @@ const assert = require('node:assert/strict');
     await desktop.goto('http://127.0.0.1:8765/', { waitUntil: 'domcontentloaded' });
     await desktop.locator('nav [data-tab="bcs"]').click();
     assert.equal(await desktop.locator('#bcs').isVisible(), true, 'Desktop BCS must be visible');
-    assert.equal(await desktop.locator('#bcsRoot [data-view="Studio"]').getAttribute('aria-selected'), 'true');
+    assert.equal(await desktop.locator('#bcsGallery').isVisible(), true, 'Desktop deity gallery must be visible');
     assert.ok(navigations.every(url => !url.includes('buddhist-content-studio.mrtnhasen.chatgpt.site')), 'BCS must remain inside LHS');
     await desktop.screenshot({ path: '/tmp/lhs-bcs-desktop.png', fullPage: true });
 
