@@ -71,6 +71,13 @@ jobs:
           npx playwright install --with-deps chromium
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/lhs-http.log 2>&1 &
           node scripts/bcs-browser-smoke.cjs
+      - name: Upload mobile browser screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lhs-bcs-mobile-smoke-${{ github.sha }}
+          path: /tmp/lhs-bcs-mobile.png
+          if-no-files-found: warn
       - name: Stage build artifact and embed source commit
         run: |
           export SOURCE_SHA="$(git rev-parse HEAD)"
