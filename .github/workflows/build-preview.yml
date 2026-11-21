@@ -65,6 +65,12 @@ jobs:
               subprocess.run(['node','--check',path],check=True)
           print('BCS integration and JavaScript syntax checks passed')
           PY
+      - name: Browser smoke test (mobile viewport)
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/lhs-http.log 2>&1 &
+          node scripts/bcs-browser-smoke.cjs
       - name: Stage build artifact and embed source commit
         run: |
           export SOURCE_SHA="$(git rev-parse HEAD)"
