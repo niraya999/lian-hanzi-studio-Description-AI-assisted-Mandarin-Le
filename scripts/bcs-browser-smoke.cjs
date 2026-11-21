@@ -59,13 +59,21 @@ const assert = require('node:assert/strict');
         artFolder: [{id:'nestedImage',name:'artwork.svg',mimeType:'image/svg+xml'}]
       };
       window.lhsBcsDrive.connected = () => true;
+      window.lhsBcsDrive.identity = async () => 'smoke@example.com';
+      window.__bcsBlobCalls = 0;
       window.lhsBcsDrive.list = async id => folders[id === '16E4O7n0oVTVOXqXg4ff_Vz6TxK-qdJv1' ? 'root' : id] || [];
-      window.lhsBcsDrive.blob = async id => id === 'text1' ? new Blob(['Tara research notes'], {type:'text/plain'}) : new Blob(['<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><rect width="20" height="20" fill="green"/></svg>'], {type:'image/svg+xml'});
+      window.lhsBcsDrive.blob = async id => { window.__bcsBlobCalls++; return id === 'text1' ? new Blob(['Tara research notes'], {type:'text/plain'}) : new Blob(['<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><rect width="20" height="20" fill="green"/></svg>'], {type:'image/svg+xml'}); };
       window.lhsBcsGallery.refresh();
     });
     assert.equal(await desktop.getByRole('button', { name: 'Testing' }).count(), 0, 'Non-deity collections must be excluded');
     await desktop.locator('#bcsGallery .dg-cover img').first().waitFor();
     await desktop.getByRole('button', { name: 'Nested Deity' }).locator('img').waitFor();
+    // Cache must survive a gallery refresh without downloading artwork again.
+    const beforeRefresh = await desktop.evaluate(() => window.__bcsBlobCalls);
+    await desktop.evaluate(() => window.lhsBcsGallery.refresh());
+    await desktop.locator('#bcsGallery .dg-cover img').first().waitFor();
+    const afterRefresh = await desktop.evaluate(() => window.__bcsBlobCalls);
+    assert.equal(afterRefresh, beforeRefresh, 'Thumbnail cache should avoid repeat Drive blob download');
     // Simulate OAuth success notification: gallery must refresh without a manual click.
     await desktop.evaluate(() => {
       window.lhsBcsDrive.list = async id => id === '16E4O7n0oVTVOXqXg4ff_Vz6TxK-qdJv1'
