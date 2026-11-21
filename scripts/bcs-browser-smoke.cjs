@@ -62,6 +62,19 @@ const assert = require('node:assert/strict');
       window.lhsBcsGallery.refresh();
     });
     await desktop.locator('#bcsGallery .dg-cover img').first().waitFor();
+    // Simulate OAuth success notification: gallery must refresh without a manual click.
+    await desktop.evaluate(() => {
+      window.lhsBcsDrive.list = async id => id === '16E4O7n0oVTVOXqXg4ff_Vz6TxK-qdJv1'
+        ? [{id:'tara',name:'Green Tara',mimeType:'application/vnd.google-apps.folder'},{id:'maitreya',name:'Maitreya',mimeType:'application/vnd.google-apps.folder'}]
+        : id === 'tara' ? [
+          {id:'image1',name:'cover.png',mimeType:'image/png'},
+          {id:'video1',name:'teaser.mp4',mimeType:'video/mp4'},
+          {id:'text1',name:'notes.txt',mimeType:'text/plain'},
+          {id:'nested',name:'Research',mimeType:'application/vnd.google-apps.folder'}
+        ] : [];
+      window.dispatchEvent(new Event('lhs-drive-connected'));
+    });
+    await desktop.getByRole('button', { name: 'Maitreya' }).waitFor();
     await desktop.getByRole('button', { name: 'Green Tara' }).click();
     for (const heading of ['Images (1)','Videos (1)','Text & documents (1)','Folders (1)']) {
       await desktop.locator('#bcsGallery').getByRole('heading', { name: heading }).waitFor();
