@@ -11,7 +11,33 @@ function clearUrls(){urls.forEach(x=>URL.revokeObjectURL(x));urls=[]}
 function button(label,fn){const b=el('button','dg-action',label);b.type='button';b.onclick=fn;return b}
 function top(title,back){const bar=el('div','dg-top');const h=el('h2','',title);bar.append(h);if(back)bar.append(button('← All deities',()=>showGallery()));bar.append(button('Studio editor',()=>{++generation;clearUrls();gallery.hidden=true;host.hidden=false;mode='editor'}));return bar}
 function status(message){gallery.replaceChildren(top('Deity Library'));gallery.append(el('p','',message));gallery.append(button('Connect / refresh Drive',()=>{if(!drive.connected())drive.connect();else showGallery()}))}
-async function cover(id,container,seq){try{const children=await drive.list(id);if(seq!==generation)return;const first=children.find(f=>f.mimeType?.startsWith('image/'));if(!first)return;const blob=await drive.blob(first.id);if(seq!==generation)return;const url=URL.createObjectURL(blob);urls.push(url);const img=el('img');img.alt='Folder artwork';img.src=url;container.replaceChildren(img)}catch{}}
+async function findArtwork(id,depth=0,visited=new Set()){
+  if(visited.has(id))return null;
+  visited.add(id);
+  const children=await drive.list(id);
+  const images=children.filter(f=>f.mimeType?.startsWith('image/'));
+  const preferred=images.find(f=>/cover|thumb|poster|front|artwork/i.test(f.name||''));
+  if(preferred||images.length)return preferred||images[0];
+  if(depth>=2)return null;
+  for(const sub of children.filter(f=>f.mimeType===FOLDER).slice(0,12)){
+    try{const found=await findArtwork(sub.id,depth+1,visited);if(found)return found}catch{}
+  }
+  return null;
+}
+async function cover(id,container,seq){
+  try{
+    const first=await findArtwork(id);
+    if(seq!==generation||!container.isConnected)return;
+    if(!first){container.title='No image found in this folder or its first two subfolder levels';return}
+    const blob=await drive.blob(first.id);
+    if(seq!==generation||!container.isConnected)return;
+    if(!blob.type.startsWith('image/'))throw Error('Not an image');
+    const url=URL.createObjectURL(blob);
+    const img=el('img');img.alt='Folder artwork';img.onload=()=>{if(seq===generation&&container.isConnected){urls.push(url);container.replaceChildren(img)}else URL.revokeObjectURL(url)};
+    img.onerror=()=>{URL.revokeObjectURL(url);container.title='Image preview could not be decoded'};
+    img.src=url;
+  }catch(e){if(seq===generation&&container.isConnected)container.title='Thumbnail unavailable: '+(e?.message||'Drive error')}
+}
 async function showGallery(){mode='gallery';host.hidden=true;gallery.hidden=false;folder=null;const seq=++generation;clearUrls();if(!drive.connected()){status('Connect Google Drive in Music Library to display deity folders.');return}status('Loading deity folders…');try{const all=await drive.list(ROOT);if(seq!==generation)return;const nonDeity=new Set(['app data','music albums','dharma knowledge','testing']);files=all.filter(x=>x.mimeType===FOLDER&&!nonDeity.has(x.name.trim().toLowerCase()));renderGallery()}catch(e){if(seq===generation)status('Could not load Drive folders: '+e.message)}}
 function renderGallery(){const seq=generation;gallery.replaceChildren(top('Deity Library'));const input=el('input','dg-search');input.type='search';input.placeholder='Search deity folders';input.value=search;gallery.append(input);const grid=el('div','dg-grid');gallery.append(grid);const draw=()=>{grid.replaceChildren();for(const f of files.filter(x=>x.name.toLowerCase().includes(search.toLowerCase()))){const card=el('button','dg-card'),thumb=el('span','dg-cover','🪷');card.append(thumb,el('span','dg-label',f.name));card.onclick=()=>openFolder(f);grid.append(card);thumb.dataset.folder=f.id;if(observer)observer.observe(thumb);else if(grid.children.length<=12)cover(f.id,thumb,seq)}};let observer;if('IntersectionObserver'in window)observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){observer.unobserve(entry.target);const id=entry.target.dataset.folder;if(id)cover(id,entry.target,seq)}}},{rootMargin:'150px'});input.oninput=()=>{search=input.value;observer?.disconnect();draw()};draw()}
 async function openFolder(f){mode='folder';folder=f;const seq=++generation;clearUrls();gallery.replaceChildren(top(f.name,true),el('p','','Loading files…'));try{const items=await drive.list(f.id);if(seq!==generation)return;renderFolder(f,items)}catch(e){if(seq===generation)gallery.append(el('p','','Could not read folder: '+e.message))}}
