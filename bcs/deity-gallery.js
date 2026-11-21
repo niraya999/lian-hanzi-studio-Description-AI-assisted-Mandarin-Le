@@ -24,14 +24,63 @@ async function findArtwork(id,depth=0,visited=new Set()){
   }
   return null;
 }
+const CACHE_NAME='lhs-bcs-thumbnails-v1',CACHE_LIMIT=150,CACHE_AGE=7*24*60*60*1000;
+let accountKey='',accountPromise=null;
+async function accountScope(){
+  if(accountKey)return accountKey;
+  if(!accountPromise)accountPromise=(async()=>{
+    if(!drive.identity||!window.crypto?.subtle||!window.caches)return '';
+    const email=await drive.identity();
+    if(!email)return '';
+    const bytes=new TextEncoder().encode(email.trim().toLowerCase());
+    const hash=await crypto.subtle.digest('SHA-256',bytes);
+    return Array.from(new Uint8Array(hash)).map(x=>x.toString(16).padStart(2,'0')).join('').slice(0,24);
+  })().catch(()=> '');
+  return accountKey=await accountPromise;
+}
+async function cacheGet(key){
+  const cache=await caches.open(CACHE_NAME),res=await cache.match(key);
+  if(!res)return null;
+  const saved=Number(res.headers.get('x-bcs-saved')||0);
+  if(!saved||Date.now()-saved>CACHE_AGE){await cache.delete(key);return null}
+  return res.blob();
+}
+async function cachePut(key,blob){
+  if(!blob?.type.startsWith('image/')||!blob.size)return;
+  const cache=await caches.open(CACHE_NAME);
+  await cache.put(key,new Response(blob,{headers:{'Content-Type':blob.type,'x-bcs-saved':String(Date.now())}}));
+  const keys=await cache.keys();
+  if(keys.length>CACHE_LIMIT){
+    const entries=await Promise.all(keys.map(async k=>({key:k,saved:Number((await cache.match(k))?.headers.get('x-bcs-saved')||0)})));
+    entries.sort((a,b)=>a.saved-b.saved);
+    await Promise.all(entries.slice(0,keys.length-CACHE_LIMIT).map(x=>cache.delete(x.key)));
+  }
+}
+async function shrink(blob){
+  if(!blob.type.startsWith('image/')||blob.type==='image/svg+xml')return blob;
+  try{
+    const bitmap=await createImageBitmap(blob);
+    const scale=Math.min(1,360/Math.max(bitmap.width,bitmap.height));
+    const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(bitmap.width*scale));canvas.height=Math.max(1,Math.round(bitmap.height*scale));
+    canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
+    return await new Promise(resolve=>canvas.toBlob(b=>resolve(b||blob),'image/webp',.78));
+  }catch{return blob}
+}
 async function cover(id,container,seq){
   try{
     const first=await findArtwork(id);
     if(seq!==generation||!container.isConnected)return;
     if(!first){container.title='No image found in this folder or its first two subfolder levels';return}
-    const blob=await drive.blob(first.id);
+    const scope=await accountScope();
+    const key=scope?new URL('/__bcs_thumb__/'+scope+'/'+encodeURIComponent(first.id)+'/'+encodeURIComponent(first.modifiedTime||'unknown'),location.origin).href:null;
+    let blob=key?await cacheGet(key).catch(()=>null):null;
+    if(!blob){
+      blob=await drive.blob(first.id);
+      if(!blob.type.startsWith('image/'))throw Error('Not an image');
+      blob=await shrink(blob);
+      if(key)cachePut(key,blob).catch(()=>{});
+    }
     if(seq!==generation||!container.isConnected)return;
-    if(!blob.type.startsWith('image/'))throw Error('Not an image');
     const url=URL.createObjectURL(blob);
     const img=el('img');img.alt='Folder artwork';img.onload=()=>{if(seq===generation&&container.isConnected){urls.push(url);container.replaceChildren(img)}else URL.revokeObjectURL(url)};
     img.onerror=()=>{URL.revokeObjectURL(url);container.title='Image preview could not be decoded'};
@@ -46,6 +95,6 @@ function renderFolder(f,items){gallery.replaceChildren(top(f.name,true));for(con
 async function preview(item,parent,items){const seq=++generation;clearUrls();gallery.replaceChildren(top(item.name,true));gallery.append(button('← Back to '+parent.name,()=>{++generation;clearUrls();renderFolder(parent,items)}));const target=el('div','dg-section','Loading preview…');gallery.append(target);try{const m=item.mimeType||'';if(m.startsWith('image/')||m.startsWith('video/')||m.startsWith('audio/')||m.startsWith('text/')){const blob=await drive.blob(item.id);if(seq!==generation)return;target.replaceChildren();if(m.startsWith('text/')){const contents=await blob.text();if(seq!==generation)return;const pre=el('pre','',contents.slice(0,100000));pre.style.whiteSpace='pre-wrap';pre.style.overflowWrap='anywhere';target.append(pre)}else{const url=URL.createObjectURL(blob);urls.push(url);const media=el(m.startsWith('image/')?'img':m.startsWith('video/')?'video':'audio',m.startsWith('image/')?'dg-preview':'dg-video');media.src=url;if(media.tagName!=='IMG')media.controls=true;media.alt=item.name;target.append(media)}}else{target.textContent='This file opens in Google Drive.';target.append(button('Open in Drive',()=>window.open('https://drive.google.com/file/d/'+encodeURIComponent(item.id)+'/view','_blank','noopener,noreferrer')))}}catch(e){if(seq===generation)target.textContent='Preview unavailable: '+e.message}}
 const nav=document.querySelector('nav [data-tab="bcs"]');nav?.addEventListener('click',()=>showGallery());
 const returnButton=button('← Deity Gallery',showGallery);returnButton.id='bcsReturnGallery';host.prepend(returnButton);gallery.append(button('Load deity folders',showGallery));showGallery();
-window.addEventListener('lhs-drive-connected',()=>{if(mode!=='editor')showGallery()});
+window.addEventListener('lhs-drive-connected',()=>{accountKey='';accountPromise=null;if(mode!=='editor')showGallery()});
 window.lhsBcsGallery={refresh:showGallery};
 })();
