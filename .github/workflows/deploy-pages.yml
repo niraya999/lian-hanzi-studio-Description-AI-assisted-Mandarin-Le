@@ -29,6 +29,8 @@ jobs:
           grep -q 'bcs/bcs-native.js?v=2' dist/index.html
           grep -q 'data-tab="bcs"' dist/index.html
           test -s dist/bcs/bcs-native.js
+          test -s dist/bcs/deity-gallery.js
+          grep -q 'bcs/deity-gallery.js?v=1' dist/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
