@@ -26,5 +26,17 @@ const source=el('button','','Buka lagu sumber');source.onclick=()=>{if(typeof wi
 const history=$('wordHistory');history.replaceChildren();for(let day=-1;day>=-7;day--){const item=selected(day);if(!item)continue;const row=el('div','daily-history-row',dateKey(day)+' · '+item.word+' · '+item.meaning);history.append(row)}
 }
 window.lhsCaptureLyrics=(id,title,lyrics,url)=>{if(!id||!hanLines(lyrics).length)return;const tracks=getTracks().filter(t=>t.id!==id);tracks.push({id,title:String(title),lyrics:String(lyrics).slice(0,80000),url:String(url||'')});try{localStorage.setItem(KEY,JSON.stringify(tracks.slice(-MAX_TRACKS)))}catch(e){console.warn('Word of the Day cache unavailable',e)}render()};
+let scanning=false;
+window.lhsAutoDiscoverWords=async albums=>{
+ if(scanning||!Array.isArray(albums)||!albums.length||typeof window.lhsScanLyrics!=='function')return;
+ const stamp=dateKey(),scanKey='lhs.wordscan.'+stamp;
+ if(entries().length>=12&&localStorage.getItem(scanKey)==='done')return;
+ scanning=true;
+ const root=$('dailyWord');
+ const hint=document.createElement('p');hint.id='wordScanStatus';hint.textContent='Mencari kosakata dari lirik Google Drive…';root?.append(hint);
+ try{const found=await window.lhsScanLyrics(albums,(count,checked)=>{hint.textContent='Memindai lirik: '+checked+' lagu diperiksa, '+count+' memiliki Hanzi…'});if(found>0)localStorage.setItem(scanKey,'done')}
+ catch(e){console.warn('Daily word discovery unavailable',e)}
+ finally{scanning=false;render()}
+};
 window.lhsRenderDailyWord=render;if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();
 })();
