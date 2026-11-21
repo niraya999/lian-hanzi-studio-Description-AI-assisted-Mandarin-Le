@@ -47,7 +47,7 @@ const assert = require('node:assert/strict');
     // Mock read-only Drive data: deterministic UI coverage without external OAuth.
     await desktop.evaluate(() => {
       const folders = {
-        root: [{id:'tara',name:'Green Tara',mimeType:'application/vnd.google-apps.folder'}],
+        root: [{id:'tara',name:'Green Tara',mimeType:'application/vnd.google-apps.folder'},{id:'testing',name:'Testing',mimeType:'application/vnd.google-apps.folder'}],
         tara: [
           {id:'image1',name:'cover.png',mimeType:'image/png'},
           {id:'video1',name:'teaser.mp4',mimeType:'video/mp4'},
@@ -61,6 +61,7 @@ const assert = require('node:assert/strict');
       window.lhsBcsDrive.blob = async id => new Blob([id === 'text1' ? 'Tara research notes' : 'sample'], {type:id === 'text1' ? 'text/plain':'image/png'});
       window.lhsBcsGallery.refresh();
     });
+    assert.equal(await desktop.getByRole('button', { name: 'Testing' }).count(), 0, 'Non-deity collections must be excluded');
     await desktop.locator('#bcsGallery .dg-cover img').first().waitFor();
     // Simulate OAuth success notification: gallery must refresh without a manual click.
     await desktop.evaluate(() => {
