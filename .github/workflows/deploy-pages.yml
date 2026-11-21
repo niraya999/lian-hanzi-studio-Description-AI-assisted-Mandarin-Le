@@ -1,4 +1,4 @@
-name: Deploy Lian Universe Hub
+name: Deploy Lian Hanzi Studio
 on:
   push:
     branches: [main]
@@ -21,11 +21,14 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Prepare site
         run: |
-          mkdir -p dist
+          mkdir -p dist/bcs
+          cp bcs/bcs-native.js dist/bcs/
           cp index.html word-of-the-day.js verified-words.js sw.js manifest.webmanifest icon.svg landscape.svg CNAME dist/
           python3 scripts/stamp-build.py --html dist/index.html --commit "$(git rev-parse HEAD)" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          grep -q 'Lian Universe Hub' dist/index.html
-          grep -q 'buddhist-content-studio.mrtnhasen.chatgpt.site' dist/index.html
+          grep -q 'Lian Hanzi Studio' dist/index.html
+          grep -q 'bcs/bcs-native.js?v=2' dist/index.html
+          grep -q 'data-tab="bcs"' dist/index.html
+          test -s dist/bcs/bcs-native.js
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
