@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Validate source assets
         run: |
           python3 - <<'PY'
@@ -25,14 +27,16 @@ jobs:
           PY
       - name: Stage build artifact and embed source commit
         run: |
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
           mkdir -p dist
           cp index.html word-of-the-day.js sw.js manifest.webmanifest icon.svg landscape.svg dist/
-          python3 scripts/stamp-build.py --html dist/index.html --commit "$GITHUB_SHA" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          python3 scripts/stamp-build.py --html dist/index.html --commit "$SOURCE_SHA" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           python3 - <<'PY'
           import os
           from pathlib import Path
           html = Path('dist/index.html').read_text()
-          assert f'name="lhs-commit" content="{os.environ["GITHUB_SHA"]}"' in html
+          assert f'name="lhs-commit" content="{os.environ["SOURCE_SHA"]}"' in html
           assert 'name="lhs-build-date" content="20' in html
           print('Build metadata verified')
           PY
