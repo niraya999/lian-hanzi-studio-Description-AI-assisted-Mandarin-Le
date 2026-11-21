@@ -76,7 +76,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lhs-bcs-mobile-smoke-${{ github.sha }}
-          path: /tmp/lhs-bcs-mobile.png
+          path: |
+            /tmp/lhs-bcs-mobile.png
+            /tmp/lhs-bcs-desktop.png
           if-no-files-found: warn
       - name: Stage build artifact and embed source commit
         run: |
