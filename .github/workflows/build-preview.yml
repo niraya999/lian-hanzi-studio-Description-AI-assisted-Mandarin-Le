@@ -61,7 +61,7 @@ jobs:
                   file = Path(tmp) / f'inline-{i}.js'
                   file.write_text(script)
                   subprocess.run(['node','--check',str(file)],check=True)
-          for path in ('bcs/bcs-native.js','sw.js','word-of-the-day.js','verified-words.js'):
+          for path in ('bcs/bcs-native.js','bcs/deity-gallery.js','sw.js','word-of-the-day.js','verified-words.js'):
               subprocess.run(['node','--check',path],check=True)
           print('BCS integration and JavaScript syntax checks passed')
           PY
@@ -87,7 +87,7 @@ jobs:
           mkdir -p dist
           cp index.html word-of-the-day.js verified-words.js sw.js manifest.webmanifest icon.svg landscape.svg dist/
           mkdir -p dist/bcs
-          cp bcs/bcs-native.js dist/bcs/
+          cp bcs/bcs-native.js bcs/deity-gallery.js dist/bcs/
           python3 scripts/stamp-build.py --html dist/index.html --commit "$SOURCE_SHA" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           python3 - <<'PY'
           import os
