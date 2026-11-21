@@ -9,6 +9,11 @@ const assert = require('node:assert/strict');
     await page.goto('http://127.0.0.1:8765/', { waitUntil: 'domcontentloaded' });
     await page.locator('nav [data-tab="bcs"]').click();
     await page.locator('#bcsRoot [data-view="Studio"]').waitFor();
+    for (const section of ['Studio', 'Calendar', 'Asset library', 'Sources', 'Connected accounts']) {
+      await page.locator('#bcsRoot [data-view="' + section + '"]').click();
+      assert.equal(await page.locator('#bcsRoot [data-view="' + section + '"]').getAttribute('aria-selected'), 'true');
+    }
+    await page.locator('#bcsRoot [data-view="Studio"]').click();
     assert.equal(await page.locator('#bcs').isVisible(), true);
     page.once('dialog', dialog => dialog.accept('Smoke Test Project'));
     await page.locator('#bcsRoot [data-action="new"]').first().click();
