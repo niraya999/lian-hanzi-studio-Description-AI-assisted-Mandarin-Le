@@ -61,6 +61,7 @@ const assert = require('node:assert/strict');
       window.lhsBcsDrive.blob = async id => new Blob([id === 'text1' ? 'Tara research notes' : 'sample'], {type:id === 'text1' ? 'text/plain':'image/png'});
       window.lhsBcsGallery.refresh();
     });
+    await desktop.locator('#bcsGallery .dg-cover img').first().waitFor();
     await desktop.getByRole('button', { name: 'Green Tara' }).click();
     for (const heading of ['Images (1)','Videos (1)','Text & documents (1)','Folders (1)']) {
       await desktop.locator('#bcsGallery').getByRole('heading', { name: heading }).waitFor();
