@@ -11,3 +11,6 @@
 .settings-heading{display:flex;align-items:center;gap:12px}
 @media(min-width:900px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}.news-card:first-child{grid-column:span 2;display:grid;grid-template-columns:1.1fr 1fr}.news-card:first-child .news-image{height:100%;min-height:270px}.news-card:first-child h3{font-size:1.65rem}}
 @media(max-width:520px){main{padding:14px 14px 50px}.editorial-intro{padding-top:22px}.cards{gap:14px}}
+
+/* Editorial header: one masthead row, no secondary navigation bar. */
+header{border-bottom:1px solid #26384e;padding:8px 0 16px;margin-bottom:22px;flex-wrap:nowrap}header h1{font-size:clamp(1.45rem,4vw,2rem);margin:3px 0}.header-actions{display:flex;gap:8px;align-items:center}.icon-button{width:42px;height:42px;padding:0;display:grid;place-items:center;font-size:23px;border-radius:50%;background:transparent;border:1px solid #34475f}.icon-button:hover{background:#24364e}.toolbar{margin-top:8px}.toolbar h2{font-size:1.45rem}@media(max-width:520px){main{padding-top:12px}.eyebrow{font-size:9px;letter-spacing:.1em}.icon-button{width:38px;height:38px}}
