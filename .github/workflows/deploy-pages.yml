@@ -12,8 +12,9 @@ jobs:
       - uses: actions/checkout@v4
       - name: Prepare site
         run: |
-          mkdir -p dist/bcs
+          mkdir -p dist/bcs dist/lcf
           cp bcs/bcs-native.js bcs/deity-gallery.js dist/bcs/
+          cp lcf/index.html lcf/app.js lcf/style.css dist/lcf/
           cp index.html word-of-the-day.js verified-words.js home-card-images.js home-menu-config.json sw.js manifest.webmanifest icon.svg landscape.svg CNAME dist/
           python3 scripts/stamp-build.py --html dist/index.html --commit "$(git rev-parse HEAD)" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           grep -q 'Lian Hanzi Studio' dist/index.html
@@ -25,6 +26,8 @@ jobs:
           test -s dist/bcs/deity-gallery.js
           test -s dist/home-card-images.js
           test -s dist/home-menu-config.json
+          test -s dist/lcf/index.html
+          grep -q 'id="openLcfModule"' dist/index.html
       - uses: actions/upload-artifact@v4
         with:
           name: lhs-site-validation
