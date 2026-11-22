@@ -10,6 +10,8 @@ const assert = require('node:assert/strict');
     // Verify the actual Home gear Browse click handler runs on mobile, without Google OAuth.
     await page.locator('#hub .hub-card-more').first().click();
     await page.locator('.hub-card-dialog').getByText('Drive browser ready (build 12)').waitFor();
+    assert.equal(await page.locator('.hub-card-dialog').getByRole('button', { name: 'Apply to this device' }).isVisible(), true);
+    assert.equal(await page.locator('.hub-card-dialog').getByRole('button', { name: 'Reset local image' }).isVisible(), true);
     await page.locator('.hub-card-dialog').getByRole('button', { name: 'Browse Google Drive' }).click();
     await page.locator('.hub-card-dialog [role="status"]').getByText(/Google sign-in started|Google Identity Services is not ready|Drive picker opened|Drive browser unavailable|Opening Google Drive/).waitFor();
     await page.locator('.hub-card-dialog').getByRole('button', { name: 'Close' }).click();
