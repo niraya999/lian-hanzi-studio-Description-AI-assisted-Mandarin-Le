@@ -1,28 +1,16 @@
 "use strict";
-// Phase 1 local demo only. No network calls, no BCS transfer, no TikTok upload.
-const KEY = "acf.phase1.review.v1";
-const STATES = ["DRAFT","READY_FOR_REVIEW","APPROVED","PUBLISHED","ARCHIVED_TO_BCS"];
-const sample = {id:"DEMO-001",title:"Contoh konten Dharma",status:"DRAFT",publishedAt:null};
-function read(){try{const v=JSON.parse(localStorage.getItem(KEY));return v&&v.id===sample.id&&STATES.includes(v.status)?v:{...sample};}catch{return {...sample};}}
-let item=read();
-const $ = id => document.getElementById(id);
-function save(){localStorage.setItem(KEY,JSON.stringify(item));render();}
-function render(){
-  $("content-title").textContent=item.title;
-  $("status").textContent=item.status;
-  $("publication-time").textContent=item.publishedAt||"Belum dikonfirmasi";
-  $("review").disabled=item.status!=="DRAFT";
-  $("approve").disabled=item.status!=="READY_FOR_REVIEW";
-  $("publish").disabled=item.status!=="APPROVED";
-  $("send").disabled=true; // No BCS API configured; never claim a transfer.
-  $("notice").textContent=item.status==="PUBLISHED"?"Publikasi dicatat pada browser ini. Transfer ke BCS belum tersedia.":"Mode demo lokal: tidak ada video sungguhan atau koneksi BCS.";
-}
-$("review").addEventListener("click",()=>{if(item.status==="DRAFT"){item.status="READY_FOR_REVIEW";save();}});
-$("approve").addEventListener("click",()=>{if(item.status==="READY_FOR_REVIEW"){item.status="APPROVED";save();}});
-$("publish").addEventListener("click",()=>{
-  if(item.status!=="APPROVED")return;
-  if(!window.confirm("Konfirmasi bahwa video SUDAH berhasil diunggah ke TikTok secara manual?"))return;
-  item.status="PUBLISHED";item.publishedAt=new Date().toISOString();save();
-});
-$("reset").addEventListener("click",()=>{if(window.confirm("Reset data demo lokal?")){item={...sample};save();}});
-render();
+const $=id=>document.getElementById(id);
+const KEY="lcf.discovery.sources.v1";
+const defaults=[{id:"tbsn-id",name:"TBSN Indonesia",url:"https://id.tbsn.org/",enabled:true,method:"auto"},{id:"tbsn-zh",name:"TBSN Mandarin",url:"https://www.tbsn.org/",enabled:true,method:"auto"},{id:"cbeta",name:"CBETA",url:"https://www.cbeta.org/",enabled:false,method:"auto"}];
+let sources;
+try{const stored=JSON.parse(localStorage.getItem(KEY));sources=Array.isArray(stored)&&stored.length?stored:structuredClone(defaults);}catch{sources=structuredClone(defaults);}
+function save(){localStorage.setItem(KEY,JSON.stringify(sources));renderSources();}
+function validUrl(raw){try{const u=new URL(raw);return u.protocol==="https:"&&!u.username&&!u.password&&u.hostname.includes(".")&&!/^(localhost|127\\.|10\\.|192\\.168\\.)/.test(u.hostname);}catch{return false;}}
+function element(tag,txt,cls){const n=document.createElement(tag);if(txt!==undefined)n.textContent=txt;if(cls)n.className=cls;return n;}
+function renderSources(){const root=$("sources");root.replaceChildren();sources.forEach(s=>{const row=element("div",undefined,"source");const name=element("strong",s.name);const url=element("small",s.url);const toggle=document.createElement("input");toggle.type="checkbox";toggle.checked=!!s.enabled;toggle.setAttribute("aria-label","Aktifkan "+s.name);toggle.addEventListener("change",()=>{s.enabled=toggle.checked;save();});const remove=element("button","Hapus");remove.addEventListener("click",()=>{sources=sources.filter(x=>x.id!==s.id);save();});row.append(name,url,toggle,remove);root.append(row);});}
+function show(view){$("discover-panel").hidden=view!=="discover";$("settings-panel").hidden=view!=="settings";}
+$("home").addEventListener("click",()=>show("discover"));$("settings").addEventListener("click",()=>show("settings"));
+$("add-source").addEventListener("submit",e=>{e.preventDefault();const name=$("source-name").value.trim(),url=$("source-url").value.trim();if(!name||!validUrl(url)){$("config-notice").textContent="Masukkan nama dan alamat HTTPS publik yang valid.";return;}if(sources.some(s=>s.url===url)){$("config-notice").textContent="Website sudah ada.";return;}sources.push({id:"custom-"+Date.now(),name,url,enabled:true,method:"auto"});save();e.target.reset();$("config-notice").textContent="Disimpan di browser ini. Ekspor JSON untuk diterapkan melalui review."});
+$("export").addEventListener("click",()=>{const blob=new Blob([JSON.stringify({version:1,sources},null,2)],{type:"application/json"});const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download="lcf-sources.json";a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);});
+async function refresh(){const btn=$("generate");btn.disabled=true;$("notice").textContent="Membaca hasil collector terakhir…";try{const res=await fetch("./articles.json?cache="+Date.now(),{cache:"no-store"});if(!res.ok)throw Error("HTTP "+res.status);const data=await res.json();$("updated").textContent=data.generated_at?"Terakhir dikumpulkan: "+new Date(data.generated_at).toLocaleString("id-ID"):"Belum pernah dikumpulkan";const root=$("articles");root.replaceChildren();const articles=Array.isArray(data.articles)?data.articles:[];for(const a of articles){if(!validUrl(a.url))continue;const card=element("article");card.append(element("small",a.source+" · "+(a.date||"Tanggal tidak tersedia")),element("h2",a.title),element("p",a.summary||"Ringkasan tidak tersedia dari sumber."));const link=element("a","Baca artikel asli");link.href=a.url;link.target="_blank";link.rel="noopener noreferrer";card.append(link);root.append(card);}const count=root.childElementCount;$("notice").textContent=count?count+" artikel tersedia.":"Belum ada artikel. Jalankan collector terlebih dahulu atau periksa status sumber.";}catch(e){$("notice").textContent="Tidak dapat membaca hasil discovery: "+e.message;}finally{btn.disabled=false;}}
+$("generate").addEventListener("click",refresh);renderSources();refresh();
