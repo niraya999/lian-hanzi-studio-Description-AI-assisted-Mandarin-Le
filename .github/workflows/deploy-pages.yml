@@ -1,24 +1,15 @@
-name: Deploy Lian Hanzi Studio
+name: Validate Lian Hanzi Studio Site
 on:
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
-  pages: write
-  id-token: write
-concurrency:
-  group: pages
-  cancel-in-progress: true
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
       - name: Prepare site
         run: |
           mkdir -p dist/bcs
@@ -28,14 +19,13 @@ jobs:
           grep -q 'Lian Hanzi Studio' dist/index.html
           grep -q 'bcs/bcs-native.js?v=2' dist/index.html
           grep -q 'data-tab="bcs"' dist/index.html
-          test -s dist/bcs/bcs-native.js
-          test -s dist/bcs/deity-gallery.js
           grep -q 'bcs/deity-gallery.js?v=2' dist/index.html
           grep -q 'home-card-images.js?v=3' dist/index.html
+          test -s dist/bcs/bcs-native.js
+          test -s dist/bcs/deity-gallery.js
           test -s dist/home-card-images.js
           test -s dist/home-menu-config.json
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
+          name: lhs-site-validation
           path: dist
-      - id: deployment
-        uses: actions/deploy-pages@v4
