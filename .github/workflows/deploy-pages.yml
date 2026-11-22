@@ -20,7 +20,7 @@ jobs:
           grep -q 'bcs/bcs-native.js?v=2' dist/index.html
           grep -q 'data-tab="bcs"' dist/index.html
           grep -q 'bcs/deity-gallery.js?v=2' dist/index.html
-          grep -q 'home-card-images.js?v=8' dist/index.html
+          grep -q 'home-card-images.js?v=9' dist/index.html
           test -s dist/bcs/bcs-native.js
           test -s dist/bcs/deity-gallery.js
           test -s dist/home-card-images.js
