@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
     await page.goto('http://127.0.0.1:8765/', { waitUntil: 'domcontentloaded' });
     // Verify the actual Home gear Browse click handler runs on mobile, without Google OAuth.
     await page.locator('#hub .hub-card-more').first().click();
-    await page.locator('.hub-card-dialog').getByText('Drive browser ready (build 10)').waitFor();
+    await page.locator('.hub-card-dialog').getByText('Drive browser ready (build 11)').waitFor();
     await page.locator('.hub-card-dialog').getByRole('button', { name: 'Browse Google Drive' }).click();
     await page.locator('.hub-card-dialog [role="status"]').getByText(/Connecting Google Drive|Drive picker unavailable|Opening Google Drive/).waitFor();
     await page.locator('.hub-card-dialog').getByRole('button', { name: 'Close' }).click();
