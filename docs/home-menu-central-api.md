@@ -1,29 +1,28 @@
-# Home Menu Inline Configuration — centralized contract
+# Home Menu — GitHub JSON + private Google Drive
 
-## Status
-Frontend implementation in PR #6. **NOT production-ready** until the authenticated backend is deployed at the same origin. This repository is GitHub Pages static content and cannot enforce administrator privileges or persist shared uploads by itself.
+## Implemented
+The public `home-menu-config.json` stores only Google Drive file IDs and x/y image positions. The Home page reads the JSON and uses the existing Google Drive OAuth **drive.readonly** bridge to fetch images. Without Drive access, default card art remains. No image binary or token is committed to GitHub.
 
-## Endpoint contract
-All endpoints must be served by a trusted backend at https://lhs.installindonesia.org/api/home-menu. Never expose cloud storage credentials or admin API keys to the browser.
+## Updating images
+1. Upload the image to a private Google Drive location, and grant read access to intended viewers.
+2. Copy its file ID from its Google Drive URL.
+3. On a Home card select ⋮, enter the ID and positions, then copy the generated JSON entry.
+4. Select Edit config on GitHub and paste the entry into the `menus` object; commit via GitHub. Only users with repository write access can save.
+5. Once GitHub Pages deploys, reconnect Google Drive and reload Home to see the new image.
 
-- GET /api/home-menu → 200 JSON: {"canEdit":false,"items":{"openMusicApp":{"imageUrl":"/api/home-menu/images/opaque-id.webp","x":50,"y":50}}}. For authenticated admin, canEdit true. For anonymous users, canEdit false. The response must use Cache-Control: private, no-store because it contains an authorization-dependent flag.
-- PUT /api/home-menu/:menuId → multipart/form-data image (optional), x, y. Admin session required, return 200 with saved {imageUrl,x,y}. Existing image retained if no file is uploaded. Validate ID against the server-side allowlist of menu IDs, x/y integer 0–100, MIME by file signature, max 5MB, decode image safely and re-encode to a safe image format, generate opaque image identifiers. Protect with CSRF token or same-site Origin verification and SameSite session cookies.
-- DELETE /api/home-menu/:menuId → admin session required, returns 204; removes custom image and restores default.
-- GET /api/home-menu/images/:opaqueId → serve images from durable object storage with appropriate Content-Type, X-Content-Type-Options: nosniff and caching headers. Never expose arbitrary file paths.
+## Security boundaries
+- The ⋮ helper is **visible to everyone**. It does not confer editing privileges. GitHub repository permissions protect writes; this is not an in-app admin-only control.
+- A file ID is not an access token; Google Drive ACLs govern image reads. Clones of the repository do not grant Drive access.
+- Existing authorized browsers can retain cached or downloaded image copies. Revocation cannot retroactively erase those.
+- The JSON and file IDs are public. Avoid storing secrets or personally identifying file names in the repository.
+- No server, GitHub token, or new OAuth scope is required. In-app one-click Save and strict admin-only ⋮ would require a separate secure GitHub OAuth authorization flow or backend.
+- New Home cards with stable IDs receive the same ⋮ helper automatically. Their IDs can be added to JSON by authorized GitHub collaborators.
+- Images must be supported by the current Drive OAuth identity. Do not make images public to work around missing permissions.
 
-## Security and storage
-- Verify the user session and admin role **on the server**, not merely by hiding the ⋮ button.
-- Session authentication must use an existing identity provider (e.g. OIDC) with server-side allowlist/role checks. No hardcoded admin email in JavaScript.
-- Store image objects in private durable storage and metadata {menu_id,object_key,x,y,updated_at,updated_by} in a durable database. Use backups and audit logging.
-- For GitHub Pages deployment, route /api/* to a separate backend behind a reverse proxy or move the frontend to a hosting platform that supports that route. GitHub Pages itself cannot proxy /api/*.
-- Browser's built-in HTTP cache may cache the public image endpoint. On update, generate a new opaque image URL.
-- In the absence of a configured backend, all Home cards continue to work with default artwork and no edit buttons.
-
-## Acceptance checks
-1. Anonymous user sees default/shared images, no ⋮, and receives 403 on PUT/DELETE.
-2. Authenticated non-admin sees shared images, no ⋮, and receives 403 on PUT/DELETE.
-3. Authenticated admin sees ⋮ on all cards, uploads image and adjusts position; update appears in a second browser after reload.
-4. Reset restores default across devices.
-5. Reject oversized/malformed files, invalid menu IDs, cross-site writes and unsupported content types.
-6. New card with a stable ID automatically receives ⋮ when admin; server must authorize the new ID before saving.
-7. Failed backend requests never silently fall back to local-only settings.
+## Acceptance
+- Public user with no Drive connection sees default art.
+- Drive account without file access sees default art.
+- Drive account with file access sees configured image.
+- Repository non-writer cannot commit changes through GitHub.
+- Writer updates JSON, GitHub Pages deploys, then viewers reload to see changes.
+- No GitHub credentials stored in frontend.
