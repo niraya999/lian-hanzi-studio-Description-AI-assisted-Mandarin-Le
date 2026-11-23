@@ -1,4 +1,32 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lian Content Factory | News</title><link rel="stylesheet" href="./style.css"></head><body><main><header class="masthead"><button id="home" class="brand-button" aria-label="Back to news"><span class="brand-mark">☸</span><span class="brand-name">Lian <b>Discovery</b></span></button><button id="settings" class="icon-button" aria-label="Source settings" title="Source settings">⚙</button></header><div class="editorial-intro"><div class="eyebrow">BUDDHIST NEWS & DISCOVERY</div><h1>Stories worth exploring.</h1><p class="muted">News, teachings, and perspectives from trusted sources.</p></div><section id="discover-panel"><div class="toolbar"><div><h2>Latest Stories</h2><small id="updated"></small></div><button id="generate" class="icon-button" aria-label="Refresh articles" title="Refresh articles">↻</button></div><p id="notice" role="status" class="muted"></p><div id="articles" class="cards"></div><small class="footnote">Refresh loads the latest published collection. It does not trigger a new crawl.</small></section><section id="settings-panel" hidden><div class="settings-heading"><button id="back-news" class="icon-button" aria-label="Back to news" title="Back to news">←</button><h2>Reference Websites</h2></div><p class="muted">Manage a local draft of your sources. Export the JSON to apply changes through repository review.</p><div id="sources"></div><form id="add-source"><label>Website Name<input id="source-name" required maxlength="80"></label><label>HTTPS URL<input id="source-url" type="url" required placeholder="https://example.org/"></label><button type="submit" class="primary">＋ <span>Add Source</span></button></form><button id="export">⇩ <span>Export JSON</span></button><p id="config-notice" role="status" class="muted"></p></section></main><script src="./app.js" defer></script><script>
-/* Same-origin parent can expand this iframe to its entire document height. */
-(()=>{if(window.parent===window)return;let last=0;const report=()=>{const height=Math.ceil(Math.max(document.documentElement.scrollHeight,document.body.scrollHeight));if(height>0&&Math.abs(height-last)>2){last=height;window.parent.postMessage({type:'lcf:content-height',height},location.origin);}};const observer=new ResizeObserver(report);observer.observe(document.documentElement);observer.observe(document.body);window.addEventListener('load',report);document.addEventListener('DOMContentLoaded',report);setTimeout(report,250);})();
+/* Measure actual article content, independent of the iframe viewport height. */
+(()=>{
+ if(window.parent===window)return;
+ let last=0;
+ const report=()=>{
+   const main=document.querySelector('main');
+   if(!main)return;
+   const bottom=Math.ceil(main.getBoundingClientRect().bottom+window.scrollY);
+   const height=Math.max(400,bottom,main.scrollHeight+main.getBoundingClientRect().top+window.scrollY);
+   if(Math.abs(height-last)>1){
+     last=height;
+     window.parent.postMessage({type:'lcf:content-height',height},location.origin);
+   }
+ };
+ const observer=new ResizeObserver(report);
+ const init=()=>{
+   const main=document.querySelector('main');
+   if(!main)return;
+   observer.observe(main);
+   const changes=new MutationObserver(report);
+   changes.observe(main,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','src','class']});
+   document.querySelectorAll('img').forEach(img=>img.addEventListener('load',report));
+   report();
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+ window.addEventListener('load',report);
+ window.addEventListener('resize',report);
+ window.addEventListener('pageshow',report);
+ setTimeout(report,300);
+})();
 </script></body></html>
