@@ -8,6 +8,10 @@ class LayoutTests(unittest.TestCase):
  def test_responsive_controls(self):
   self.assertIn('@media(max-width:440px)',page)
   self.assertIn('#nativeTrackAudio{display:block',page)
+ def test_visual_order(self):
+  ids=['id="playerSlideshow"','id="nativeAudioPanel"','id="sunoFrame"','id="sunoExtras"','id="sunoForm"']
+  offsets=[page.index(s) for s in ids]
+  self.assertEqual(offsets,sorted(offsets))
  def test_playback_logic_preserved(self):
   self.assertIn("audio.addEventListener('ended'",page)
   self.assertIn("window.loadSuno=value=>",page)
