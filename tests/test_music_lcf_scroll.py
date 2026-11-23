@@ -16,7 +16,9 @@ class ResponsiveMusicAndLCFTests(unittest.TestCase):
         self.assertIn("event.origin!==location.origin", page)
         self.assertIn("d.type!=='lcf:content-height'", page)
         self.assertIn("Math.min(100000", page)
-        self.assertIn("new ResizeObserver(report)", child)
+        self.assertIn("frame.addEventListener", page)
+        self.assertIn("observer.observe(main)", child)
+        self.assertIn("new MutationObserver(report)", child)
         self.assertIn("window.parent.postMessage({type:'lcf:content-height',height},location.origin)", child)
 if __name__ == '__main__':
     unittest.main()
