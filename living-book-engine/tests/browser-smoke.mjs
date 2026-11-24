@@ -9,11 +9,13 @@ try {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   const page = await context.newPage();
   await page.goto(origin);
-  await page.evaluate(() => indexedDB.deleteDatabase('lian-living-book-engine'));
-  await page.reload();
+  await page.locator('#library').waitFor({ state: 'visible' });
+  await page.screenshot({ path: `${output}/book-library.png`, fullPage: true });
   await page.locator('#bookCard').click();
+  await page.locator('#book[data-state="cover"]').waitFor({ state: 'visible' });
   await page.locator('#openCover').click();
-  await page.locator('.paper-page').waitFor();
+  await page.locator('#book[data-state="content"]').waitFor({ state: 'visible' });
+  await page.locator('.paper-page').waitFor({ state: 'visible' });
   if (await page.locator('.paper-page').count() !== 1) throw new Error('Portrait mode should display one page.');
   await page.locator('#nextPage').click();
   await page.getByText('PAGE 2', { exact: true }).waitFor({ state: 'visible' });
