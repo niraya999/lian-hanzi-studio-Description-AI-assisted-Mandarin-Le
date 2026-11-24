@@ -21,3 +21,20 @@
 .voices-book[data-layout=portrait] .voices-inner,.voices-book[data-layout=portrait] .voices-blank-paper,.voices-book[data-layout=portrait] .voices-title-page{flex:0 0 100%;width:100%;max-width:100%;height:100%}
 .voices-book[data-layout=spread] .voices-inner,.voices-book[data-layout=spread] .voices-blank-paper,.voices-book[data-layout=spread] .voices-title-page{flex:0 0 50%;width:50%;max-width:50%;height:100%}
 @media(max-width:760px){.voices-book-stage{overflow:hidden}.voices-book{width:min(90vw,48vh)}.voices-book[data-layout=spread]{width:min(95vw,96vh)}.voices-book[data-stage="0"],.voices-book[data-stage="4"]{width:min(90vw,48vh)}}
+
+
+/* Voices of Dawn: annotated prologue pilot; existing page-turn rules unchanged. */
+.voices-reading-tools{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:center;padding:.6rem;color:#e9dcc1}
+.voices-reading-tools label{cursor:pointer;font-size:.85rem}
+.voices-gloss{width:100%;min-height:1.3em;text-align:center;font-size:.85rem}
+.voices-prologue-page{box-sizing:border-box;width:100%;min-height:100%;max-height:100%;overflow-y:auto;padding:clamp(1rem,3vw,2.5rem);background-color:#f4ead4;background-size:cover;color:#31291f;text-align:left;box-shadow:inset 0 0 20px #7c6c5140}
+.voices-prologue-page h2{text-align:center;font-family:serif;font-size:clamp(1.3rem,3vw,2rem);margin:.2rem 0}
+.voices-page-number{text-align:center;letter-spacing:.16em;font-size:.65rem;color:#74654f}
+.voices-art-pending{min-height:5rem;display:grid;place-items:center;border:1px dashed #aa9d86;color:#766954;font-size:.8rem}
+.voices-page-illustration{width:100%;height:auto;max-height:35vh;object-fit:contain}
+.voices-content-block{margin:1rem 0;line-height:1.8}
+.voices-sentence{font-size:clamp(1rem,2vw,1.25rem);overflow-wrap:anywhere}
+.voices-word{font:inherit;color:inherit;border:0;border-bottom:1px dotted #a08a62;background:transparent;padding:0;cursor:pointer}
+.voices-word:focus-visible{outline:2px solid #826e47;outline-offset:2px}
+.voices-pinyin,.voices-translation{font-size:.85rem;color:#665743;margin:.2rem 0}
+@media(max-width:600px){.voices-prologue-page{padding:1rem}.voices-content-block{margin:.6rem 0}}

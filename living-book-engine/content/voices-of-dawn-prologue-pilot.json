@@ -1,0 +1,1137 @@
+{
+  "schema_version": "1.0-draft",
+  "book_id": "voices-of-dawn",
+  "chapter_id": "prologue",
+  "status": "delegated_draft",
+  "source_revision": 1,
+  "title": {
+    "zh-Hant": "黎明之前",
+    "pinyin": "Límíng zhīqián",
+    "en": "Before Dawn",
+    "id-ID": "Sebelum Fajar"
+  },
+  "offset_unit": "unicode_code_point",
+  "pages": [
+    {
+      "id": "prologue-p01",
+      "next_page_id": "prologue-p02",
+      "illustration": {
+        "status": "approved_asset_missing",
+        "drive_file_id": null,
+        "brief": "Wide cinematic view of peaceful mountain village, stream, morning cooking smoke; recover approved Page 01 v2, do not replace.",
+        "aspect_ratio": "2:1"
+      },
+      "audio": {
+        "narration": null,
+        "bgm": null,
+        "sfx": []
+      },
+      "blocks": [
+        {
+          "id": "prologue-p01-b1",
+          "type": "narrative",
+          "speaker_id": "narrator",
+          "sentences": [
+            {
+              "id": "prologue-p01-s1",
+              "text": {
+                "zh-Hant": "山間的溪水，流過安靜的村莊。",
+                "pinyin": "Shānjiān de xīshuǐ, liúguò ānjìng de cūnzhuāng.",
+                "en": "Mountain streams flowed through quiet villages.",
+                "id-ID": "Air sungai pegunungan mengalir melewati desa-desa yang tenang."
+              },
+              "tokens": [
+                {
+                  "text": "山間",
+                  "start": 0,
+                  "end": 2,
+                  "pinyin": "shānjiān",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "mountains",
+                    "id-ID": "pegunungan"
+                  }
+                },
+                {
+                  "text": "的",
+                  "start": 2,
+                  "end": 3,
+                  "pinyin": "de",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "linking particle",
+                    "id-ID": "partikel penghubung"
+                  }
+                },
+                {
+                  "text": "溪水",
+                  "start": 3,
+                  "end": 5,
+                  "pinyin": "xīshuǐ",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "stream water",
+                    "id-ID": "air sungai"
+                  }
+                },
+                {
+                  "text": "流過",
+                  "start": 6,
+                  "end": 8,
+                  "pinyin": "liúguò",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "flow past",
+                    "id-ID": "mengalir melewati"
+                  }
+                },
+                {
+                  "text": "安靜",
+                  "start": 8,
+                  "end": 10,
+                  "pinyin": "ānjìng",
+                  "pos": "adj",
+                  "meanings": {
+                    "en": "quiet",
+                    "id-ID": "tenang"
+                  }
+                },
+                {
+                  "text": "的",
+                  "start": 10,
+                  "end": 11,
+                  "pinyin": "de",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "linking particle",
+                    "id-ID": "partikel penghubung"
+                  }
+                },
+                {
+                  "text": "村莊",
+                  "start": 11,
+                  "end": 13,
+                  "pinyin": "cūnzhuāng",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "village",
+                    "id-ID": "desa"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "prologue-p01-b2",
+          "type": "narrative",
+          "speaker_id": "narrator",
+          "sentences": [
+            {
+              "id": "prologue-p01-s2",
+              "text": {
+                "zh-Hant": "炊煙升起，人們迎接平凡的一天。",
+                "pinyin": "Chuīyān shēngqǐ, rénmen yíngjiē píngfán de yì tiān.",
+                "en": "Cooking smoke rose as people welcomed another ordinary day.",
+                "id-ID": "Asap dapur membubung, menyambut hari yang biasa bagi penduduk."
+              },
+              "tokens": [
+                {
+                  "text": "炊煙",
+                  "start": 0,
+                  "end": 2,
+                  "pinyin": "chuīyān",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "cooking smoke",
+                    "id-ID": "asap dapur"
+                  }
+                },
+                {
+                  "text": "升起",
+                  "start": 2,
+                  "end": 4,
+                  "pinyin": "shēngqǐ",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "rise",
+                    "id-ID": "membubung"
+                  }
+                },
+                {
+                  "text": "人們",
+                  "start": 5,
+                  "end": 7,
+                  "pinyin": "rénmen",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "people",
+                    "id-ID": "orang-orang"
+                  }
+                },
+                {
+                  "text": "迎接",
+                  "start": 7,
+                  "end": 9,
+                  "pinyin": "yíngjiē",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "welcome",
+                    "id-ID": "menyambut"
+                  }
+                },
+                {
+                  "text": "平凡",
+                  "start": 9,
+                  "end": 11,
+                  "pinyin": "píngfán",
+                  "pos": "adj",
+                  "meanings": {
+                    "en": "ordinary",
+                    "id-ID": "biasa"
+                  }
+                },
+                {
+                  "text": "的",
+                  "start": 11,
+                  "end": 12,
+                  "pinyin": "de",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "linking particle",
+                    "id-ID": "partikel penghubung"
+                  }
+                },
+                {
+                  "text": "一天",
+                  "start": 12,
+                  "end": 14,
+                  "pinyin": "yì tiān",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "a day",
+                    "id-ID": "satu hari"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prologue-p02",
+      "next_page_id": "prologue-p03",
+      "illustration": {
+        "status": "pending",
+        "drive_file_id": null,
+        "brief": "Distant smoke behind mountains, villagers pause at hoofbeats; non-graphic, no protagonists.",
+        "aspect_ratio": "2:1"
+      },
+      "audio": {
+        "narration": null,
+        "bgm": null,
+        "sfx": []
+      },
+      "blocks": [
+        {
+          "id": "prologue-p02-b1",
+          "type": "narrative",
+          "speaker_id": "narrator",
+          "sentences": [
+            {
+              "id": "prologue-p02-s1",
+              "text": {
+                "zh-Hant": "後來，馬蹄聲打破了村中的寧靜。",
+                "pinyin": "Hòulái, mǎtí shēng dǎpò le cūn zhōng de níngjìng.",
+                "en": "Later, the sound of hooves shattered the village's peace.",
+                "id-ID": "Kemudian, derap kaki kuda memecah ketenangan desa."
+              },
+              "tokens": [
+                {
+                  "text": "後來",
+                  "start": 0,
+                  "end": 2,
+                  "pinyin": "hòulái",
+                  "pos": "adv",
+                  "meanings": {
+                    "en": "later",
+                    "id-ID": "kemudian"
+                  }
+                },
+                {
+                  "text": "馬蹄聲",
+                  "start": 3,
+                  "end": 6,
+                  "pinyin": "mǎtí shēng",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "sound of hooves",
+                    "id-ID": "derap kaki kuda"
+                  }
+                },
+                {
+                  "text": "打破",
+                  "start": 6,
+                  "end": 8,
+                  "pinyin": "dǎpò",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "shatter",
+                    "id-ID": "memecah"
+                  }
+                },
+                {
+                  "text": "了",
+                  "start": 8,
+                  "end": 9,
+                  "pinyin": "le",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "completed action",
+                    "id-ID": "partikel aspek"
+                  }
+                },
+                {
+                  "text": "村中",
+                  "start": 9,
+                  "end": 11,
+                  "pinyin": "cūn zhōng",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "in the village",
+                    "id-ID": "di desa"
+                  }
+                },
+                {
+                  "text": "的",
+                  "start": 11,
+                  "end": 12,
+                  "pinyin": "de",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "linking particle",
+                    "id-ID": "partikel penghubung"
+                  }
+                },
+                {
+                  "text": "寧靜",
+                  "start": 12,
+                  "end": 14,
+                  "pinyin": "níngjìng",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "peace",
+                    "id-ID": "ketenangan"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "prologue-p02-b2",
+          "type": "narrative",
+          "speaker_id": "narrator",
+          "sentences": [
+            {
+              "id": "prologue-p02-s2",
+              "text": {
+                "zh-Hant": "遠方的山後，升起了黑煙。",
+                "pinyin": "Yuǎnfāng de shān hòu, shēngqǐ le hēiyān.",
+                "en": "Beyond the distant mountains, black smoke rose.",
+                "id-ID": "Di balik pegunungan yang jauh, asap hitam membubung."
+              },
+              "tokens": [
+                {
+                  "text": "遠方",
+                  "start": 0,
+                  "end": 2,
+                  "pinyin": "yuǎnfāng",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "distance",
+                    "id-ID": "kejauhan"
+                  }
+                },
+                {
+                  "text": "的",
+                  "start": 2,
+                  "end": 3,
+                  "pinyin": "de",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "linking particle",
+                    "id-ID": "partikel penghubung"
+                  }
+                },
+                {
+                  "text": "山",
+                  "start": 3,
+                  "end": 4,
+                  "pinyin": "shān",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "mountain",
+                    "id-ID": "gunung"
+                  }
+                },
+                {
+                  "text": "後",
+                  "start": 4,
+                  "end": 5,
+                  "pinyin": "hòu",
+                  "pos": "localizer",
+                  "meanings": {
+                    "en": "behind",
+                    "id-ID": "di balik"
+                  }
+                },
+                {
+                  "text": "升起",
+                  "start": 6,
+                  "end": 8,
+                  "pinyin": "shēngqǐ",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "rise",
+                    "id-ID": "membubung"
+                  }
+                },
+                {
+                  "text": "了",
+                  "start": 8,
+                  "end": 9,
+                  "pinyin": "le",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "completed action",
+                    "id-ID": "partikel aspek"
+                  }
+                },
+                {
+                  "text": "黑煙",
+                  "start": 9,
+                  "end": 11,
+                  "pinyin": "hēiyān",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "black smoke",
+                    "id-ID": "asap hitam"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prologue-p03",
+      "next_page_id": "prologue-p04",
+      "illustration": {
+        "status": "pending",
+        "drive_file_id": null,
+        "brief": "Night, mother and child waiting by wooden doorway, oil lamp, quiet expressions.",
+        "aspect_ratio": "2:1"
+      },
+      "audio": {
+        "narration": null,
+        "bgm": null,
+        "sfx": []
+      },
+      "blocks": [
+        {
+          "id": "prologue-p03-b1",
+          "type": "narrative",
+          "speaker_id": "narrator",
+          "sentences": [
+            {
+              "id": "prologue-p03-s1",
+              "text": {
+                "zh-Hant": "夜深了，一位母親仍坐在門前。",
+                "pinyin": "Yè shēn le, yí wèi mǔqīn réng zuò zài mén qián.",
+                "en": "Late into the night, a mother still sat by the door.",
+                "id-ID": "Malam semakin larut, seorang ibu masih duduk di depan pintu."
+              },
+              "tokens": [
+                {
+                  "text": "夜",
+                  "start": 0,
+                  "end": 1,
+                  "pinyin": "yè",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "night",
+                    "id-ID": "malam"
+                  }
+                },
+                {
+                  "text": "深",
+                  "start": 1,
+                  "end": 2,
+                  "pinyin": "shēn",
+                  "pos": "adj",
+                  "meanings": {
+                    "en": "late",
+                    "id-ID": "larut"
+                  }
+                },
+                {
+                  "text": "了",
+                  "start": 2,
+                  "end": 3,
+                  "pinyin": "le",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "change of state",
+                    "id-ID": "partikel perubahan"
+                  }
+                },
+                {
+                  "text": "一位",
+                  "start": 4,
+                  "end": 6,
+                  "pinyin": "yí wèi",
+                  "pos": "quantifier",
+                  "meanings": {
+                    "en": "one person",
+                    "id-ID": "seorang"
+                  }
+                },
+                {
+                  "text": "母親",
+                  "start": 6,
+                  "end": 8,
+                  "pinyin": "mǔqīn",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "mother",
+                    "id-ID": "ibu"
+                  }
+                },
+                {
+                  "text": "仍",
+                  "start": 8,
+                  "end": 9,
+                  "pinyin": "réng",
+                  "pos": "adv",
+                  "meanings": {
+                    "en": "still",
+                    "id-ID": "masih"
+                  }
+                },
+                {
+                  "text": "坐",
+                  "start": 9,
+                  "end": 10,
+                  "pinyin": "zuò",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "sit",
+                    "id-ID": "duduk"
+                  }
+                },
+                {
+                  "text": "在",
+                  "start": 10,
+                  "end": 11,
+                  "pinyin": "zài",
+                  "pos": "prep",
+                  "meanings": {
+                    "en": "at",
+                    "id-ID": "di"
+                  }
+                },
+                {
+                  "text": "門前",
+                  "start": 11,
+                  "end": 13,
+                  "pinyin": "mén qián",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "by the door",
+                    "id-ID": "depan pintu"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "prologue-p03-b2",
+          "type": "dialogue",
+          "speaker_id": "villager_child",
+          "sentences": [
+            {
+              "id": "prologue-p03-s2",
+              "text": {
+                "zh-Hant": "娘，我們還要等嗎？",
+                "pinyin": "Niáng, wǒmen hái yào děng ma?",
+                "en": "Mother, are we still going to wait?",
+                "id-ID": "Ibu, apakah kita masih akan menunggu?"
+              },
+              "tokens": [
+                {
+                  "text": "娘",
+                  "start": 0,
+                  "end": 1,
+                  "pinyin": "niáng",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "mother",
+                    "id-ID": "ibu"
+                  }
+                },
+                {
+                  "text": "我們",
+                  "start": 2,
+                  "end": 4,
+                  "pinyin": "wǒmen",
+                  "pos": "pronoun",
+                  "meanings": {
+                    "en": "we",
+                    "id-ID": "kita"
+                  }
+                },
+                {
+                  "text": "還",
+                  "start": 4,
+                  "end": 5,
+                  "pinyin": "hái",
+                  "pos": "adv",
+                  "meanings": {
+                    "en": "still",
+                    "id-ID": "masih"
+                  }
+                },
+                {
+                  "text": "要",
+                  "start": 5,
+                  "end": 6,
+                  "pinyin": "yào",
+                  "pos": "modal",
+                  "meanings": {
+                    "en": "going to",
+                    "id-ID": "akan"
+                  }
+                },
+                {
+                  "text": "等",
+                  "start": 6,
+                  "end": 7,
+                  "pinyin": "děng",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "wait",
+                    "id-ID": "menunggu"
+                  }
+                },
+                {
+                  "text": "嗎",
+                  "start": 7,
+                  "end": 8,
+                  "pinyin": "ma",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "question particle",
+                    "id-ID": "partikel tanya"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "prologue-p03-b3",
+          "type": "dialogue",
+          "speaker_id": "villager_mother",
+          "sentences": [
+            {
+              "id": "prologue-p03-s3",
+              "text": {
+                "zh-Hant": "再等一會兒吧。",
+                "pinyin": "Zài děng yíhuìr ba.",
+                "en": "A little longer.",
+                "id-ID": "Sebentar lagi, ya."
+              },
+              "tokens": [
+                {
+                  "text": "再",
+                  "start": 0,
+                  "end": 1,
+                  "pinyin": "zài",
+                  "pos": "adv",
+                  "meanings": {
+                    "en": "a little more",
+                    "id-ID": "lagi"
+                  }
+                },
+                {
+                  "text": "等",
+                  "start": 1,
+                  "end": 2,
+                  "pinyin": "děng",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "wait",
+                    "id-ID": "menunggu"
+                  }
+                },
+                {
+                  "text": "一會兒",
+                  "start": 2,
+                  "end": 5,
+                  "pinyin": "yíhuìr",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "a short while",
+                    "id-ID": "sebentar"
+                  }
+                },
+                {
+                  "text": "吧",
+                  "start": 5,
+                  "end": 6,
+                  "pinyin": "ba",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "gentle suggestion",
+                    "id-ID": "partikel ajakan"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prologue-p04",
+      "next_page_id": "prologue-p05",
+      "illustration": {
+        "status": "pending",
+        "drive_file_id": null,
+        "brief": "Neighbor offering warm porridge at doorway, natural gestures, intimate lamplight.",
+        "aspect_ratio": "2:1"
+      },
+      "audio": {
+        "narration": null,
+        "bgm": null,
+        "sfx": []
+      },
+      "blocks": [
+        {
+          "id": "prologue-p04-b1",
+          "type": "narrative",
+          "speaker_id": "narrator",
+          "sentences": [
+            {
+              "id": "prologue-p04-s1",
+              "text": {
+                "zh-Hant": "鄰居送來一碗熱粥。",
+                "pinyin": "Línjū sòng lái yì wǎn rè zhōu.",
+                "en": "A neighbor brought a bowl of warm porridge.",
+                "id-ID": "Seorang tetangga membawakan semangkuk bubur hangat."
+              },
+              "tokens": [
+                {
+                  "text": "鄰居",
+                  "start": 0,
+                  "end": 2,
+                  "pinyin": "línjū",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "neighbor",
+                    "id-ID": "tetangga"
+                  }
+                },
+                {
+                  "text": "送來",
+                  "start": 2,
+                  "end": 4,
+                  "pinyin": "sòng lái",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "bring over",
+                    "id-ID": "membawakan"
+                  }
+                },
+                {
+                  "text": "一碗",
+                  "start": 4,
+                  "end": 6,
+                  "pinyin": "yì wǎn",
+                  "pos": "quantifier",
+                  "meanings": {
+                    "en": "a bowl",
+                    "id-ID": "semangkuk"
+                  }
+                },
+                {
+                  "text": "熱",
+                  "start": 6,
+                  "end": 7,
+                  "pinyin": "rè",
+                  "pos": "adj",
+                  "meanings": {
+                    "en": "warm",
+                    "id-ID": "hangat"
+                  }
+                },
+                {
+                  "text": "粥",
+                  "start": 7,
+                  "end": 8,
+                  "pinyin": "zhōu",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "porridge",
+                    "id-ID": "bubur"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "prologue-p04-b2",
+          "type": "dialogue",
+          "speaker_id": "villager_neighbor",
+          "sentences": [
+            {
+              "id": "prologue-p04-s2",
+              "text": {
+                "zh-Hant": "趁熱吃吧。",
+                "pinyin": "Chèn rè chī ba.",
+                "en": "Eat while it's warm.",
+                "id-ID": "Makanlah selagi hangat."
+              },
+              "tokens": [
+                {
+                  "text": "趁",
+                  "start": 0,
+                  "end": 1,
+                  "pinyin": "chèn",
+                  "pos": "prep",
+                  "meanings": {
+                    "en": "while",
+                    "id-ID": "selagi"
+                  }
+                },
+                {
+                  "text": "熱",
+                  "start": 1,
+                  "end": 2,
+                  "pinyin": "rè",
+                  "pos": "adj",
+                  "meanings": {
+                    "en": "warm",
+                    "id-ID": "hangat"
+                  }
+                },
+                {
+                  "text": "吃",
+                  "start": 2,
+                  "end": 3,
+                  "pinyin": "chī",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "eat",
+                    "id-ID": "makan"
+                  }
+                },
+                {
+                  "text": "吧",
+                  "start": 3,
+                  "end": 4,
+                  "pinyin": "ba",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "gentle suggestion",
+                    "id-ID": "partikel ajakan"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prologue-p05",
+      "next_page_id": "prologue-p06",
+      "illustration": {
+        "status": "pending",
+        "drive_file_id": null,
+        "brief": "Exterior before dawn, small lit window, cool sky, stillness.",
+        "aspect_ratio": "2:1"
+      },
+      "audio": {
+        "narration": null,
+        "bgm": null,
+        "sfx": []
+      },
+      "blocks": [
+        {
+          "id": "prologue-p05-b1",
+          "type": "narrative",
+          "speaker_id": "narrator",
+          "sentences": [
+            {
+              "id": "prologue-p05-s1",
+              "text": {
+                "zh-Hant": "天還沒亮，屋裡的燈依然亮著。",
+                "pinyin": "Tiān hái méi liàng, wū lǐ de dēng yīrán liàngzhe.",
+                "en": "Dawn had not yet come, but the lamp inside still burned.",
+                "id-ID": "Fajar belum tiba, tetapi pelita di dalam rumah masih menyala."
+              },
+              "tokens": [
+                {
+                  "text": "天",
+                  "start": 0,
+                  "end": 1,
+                  "pinyin": "tiān",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "sky",
+                    "id-ID": "langit"
+                  }
+                },
+                {
+                  "text": "還",
+                  "start": 1,
+                  "end": 2,
+                  "pinyin": "hái",
+                  "pos": "adv",
+                  "meanings": {
+                    "en": "yet",
+                    "id-ID": "masih"
+                  }
+                },
+                {
+                  "text": "沒",
+                  "start": 2,
+                  "end": 3,
+                  "pinyin": "méi",
+                  "pos": "adv",
+                  "meanings": {
+                    "en": "not",
+                    "id-ID": "belum"
+                  }
+                },
+                {
+                  "text": "亮",
+                  "start": 3,
+                  "end": 4,
+                  "pinyin": "liàng",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "become light",
+                    "id-ID": "terang"
+                  }
+                },
+                {
+                  "text": "屋裡",
+                  "start": 5,
+                  "end": 7,
+                  "pinyin": "wū lǐ",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "inside the house",
+                    "id-ID": "dalam rumah"
+                  }
+                },
+                {
+                  "text": "的",
+                  "start": 7,
+                  "end": 8,
+                  "pinyin": "de",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "linking particle",
+                    "id-ID": "partikel penghubung"
+                  }
+                },
+                {
+                  "text": "燈",
+                  "start": 8,
+                  "end": 9,
+                  "pinyin": "dēng",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "lamp",
+                    "id-ID": "pelita"
+                  }
+                },
+                {
+                  "text": "依然",
+                  "start": 9,
+                  "end": 11,
+                  "pinyin": "yīrán",
+                  "pos": "adv",
+                  "meanings": {
+                    "en": "still",
+                    "id-ID": "tetap"
+                  }
+                },
+                {
+                  "text": "亮著",
+                  "start": 11,
+                  "end": 13,
+                  "pinyin": "liàngzhe",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "remain lit",
+                    "id-ID": "menyala"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "prologue-p06",
+      "next_page_id": "chapter-01-p01",
+      "illustration": {
+        "status": "not_required",
+        "drive_file_id": null,
+        "brief": "Dynamic typography only, ivory paper; no illustration.",
+        "aspect_ratio": "2:1"
+      },
+      "audio": {
+        "narration": null,
+        "bgm": null,
+        "sfx": []
+      },
+      "blocks": [
+        {
+          "id": "prologue-p06-b1",
+          "type": "title",
+          "speaker_id": null,
+          "sentences": [
+            {
+              "id": "prologue-p06-s1",
+              "text": {
+                "zh-Hant": "破曉之聲",
+                "pinyin": "Pòxiǎo zhī shēng",
+                "en": "Voices of Dawn",
+                "id-ID": "Suara Fajar"
+              },
+              "tokens": [
+                {
+                  "text": "破曉",
+                  "start": 0,
+                  "end": 2,
+                  "pinyin": "pòxiǎo",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "daybreak",
+                    "id-ID": "fajar"
+                  }
+                },
+                {
+                  "text": "之",
+                  "start": 2,
+                  "end": 3,
+                  "pinyin": "zhī",
+                  "pos": "particle",
+                  "meanings": {
+                    "en": "of",
+                    "id-ID": "penghubung"
+                  }
+                },
+                {
+                  "text": "聲",
+                  "start": 3,
+                  "end": 4,
+                  "pinyin": "shēng",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "voice",
+                    "id-ID": "suara"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "prologue-p06-b2",
+          "type": "wisdom_quote",
+          "speaker_id": null,
+          "sentences": [
+            {
+              "id": "prologue-p06-s2",
+              "text": {
+                "zh-Hant": "黑暗之後，仍有黎明。",
+                "pinyin": "Hēi'àn zhīhòu, réng yǒu límíng.",
+                "en": "After darkness, dawn still comes.",
+                "id-ID": "Setelah kegelapan, fajar tetap tiba."
+              },
+              "tokens": [
+                {
+                  "text": "黑暗",
+                  "start": 0,
+                  "end": 2,
+                  "pinyin": "hēi'àn",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "darkness",
+                    "id-ID": "kegelapan"
+                  }
+                },
+                {
+                  "text": "之後",
+                  "start": 2,
+                  "end": 4,
+                  "pinyin": "zhīhòu",
+                  "pos": "localizer",
+                  "meanings": {
+                    "en": "after",
+                    "id-ID": "setelah"
+                  }
+                },
+                {
+                  "text": "仍",
+                  "start": 5,
+                  "end": 6,
+                  "pinyin": "réng",
+                  "pos": "adv",
+                  "meanings": {
+                    "en": "still",
+                    "id-ID": "tetap"
+                  }
+                },
+                {
+                  "text": "有",
+                  "start": 6,
+                  "end": 7,
+                  "pinyin": "yǒu",
+                  "pos": "verb",
+                  "meanings": {
+                    "en": "there is",
+                    "id-ID": "ada"
+                  }
+                },
+                {
+                  "text": "黎明",
+                  "start": 7,
+                  "end": 9,
+                  "pinyin": "límíng",
+                  "pos": "noun",
+                  "meanings": {
+                    "en": "dawn",
+                    "id-ID": "fajar"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
