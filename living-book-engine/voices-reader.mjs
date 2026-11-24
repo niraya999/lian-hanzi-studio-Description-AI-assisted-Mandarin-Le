@@ -71,33 +71,54 @@ async function returnLibrary() {
 async function move(delta) {
   if (state.busy) return;
   if (state.stage === 4 && delta > 0) return returnLibrary();
-  if (state.stage === 0 && delta > 0) {
-    const progress = await storage.getProgress(state.manifest.bookId);
-    state.stage = Number.isInteger(progress?.pageIndex) ? Math.max(1,Math.min(3,progress.pageIndex)) : 1;
-  } else state.stage = Math.max(0,Math.min(4,state.stage + delta));
-  if (state.stage >= 1 && state.stage <= 3) await storage.saveProgress(state.manifest.bookId,{pageIndex:state.stage,updatedAt:Date.now()});
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const stage = book.parentElement;
-  const before = book.getBoundingClientRect();
-  const leaf = reduced ? null : book.cloneNode(true);
-  if (leaf) {
-    const bounds = stage.getBoundingClientRect();
-    leaf.removeAttribute('tabindex'); leaf.setAttribute('aria-hidden', 'true');
-    leaf.className = 'voices-book voices-turn-leaf';
-    Object.assign(leaf.style, {left: (before.left - bounds.left) + 'px', top: (before.top - bounds.top) + 'px', width: before.width + 'px', height: before.height + 'px'});
-    stage.append(leaf);
-  }
-  render();
-  if (leaf) {
-    state.busy = true;
-    const anim = leaf.animate(
-      [{transform: 'perspective(1600px) rotateY(0deg)', opacity: 1},
-       {transform: 'perspective(1600px) rotateY(' + (delta > 0 ? '-95deg' : '95deg') + ')', opacity: 0.4}],
-      {duration: 650, easing: 'ease-in-out', fill: 'forwards'}
-    );
-    try { await anim.finished; } catch {} finally { leaf.remove(); state.busy = false; }
+  state.busy = true;
+  let leaf;
+  try {
+    const previousStage = state.stage;
+    let nextStage;
+    if (previousStage === 0 && delta > 0) {
+      const progress = await storage.getProgress(state.manifest.bookId);
+      nextStage = Number.isInteger(progress?.pageIndex) ? Math.max(1, Math.min(3, progress.pageIndex)) : 1;
+    } else nextStage = Math.max(0, Math.min(4, previousStage + delta));
+    if (nextStage === previousStage) return;
+    if (nextStage >= 1 && nextStage <= 3) await storage.saveProgress(state.manifest.bookId, {pageIndex:nextStage,updatedAt:Date.now()});
+
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stage = book.parentElement;
+    const oldRect = book.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+    const isSpread = state.layout === 'spread' && previousStage > 0 && previousStage < 4;
+    const width = isSpread ? oldRect.width / 2 : oldRect.width;
+    if (!reduced) {
+      leaf = document.createElement('div');
+      leaf.className = 'voices-page-leaf';
+      leaf.setAttribute('aria-hidden','true');
+      const content = book.cloneNode(true);
+      content.removeAttribute('tabindex');
+      content.className = 'voices-page-snapshot';
+      Object.assign(content.style, { width: oldRect.width + 'px', height: oldRect.height + 'px', left: (isSpread && delta > 0 ? -width : 0) + 'px' });
+      leaf.append(content);
+      const x = oldRect.left - stageRect.left + (isSpread && delta > 0 ? width : 0);
+      Object.assign(leaf.style, {left:x + 'px',top:(oldRect.top-stageRect.top) + 'px',width:width + 'px',height:oldRect.height + 'px',transformOrigin:delta > 0 ? 'left center' : 'right center'});
+      stage.append(leaf);
+    }
+    state.stage = nextStage;
+    render();
+    if (leaf) {
+      const direction = delta > 0 ? -1 : 1;
+      const animation = leaf.animate([
+        {transform:'rotateY(0deg)',filter:'brightness(1)',opacity:1},
+        {transform:'rotateY('+ (direction * 85) +'deg)',filter:'brightness(.76)',opacity:1,offset:.52},
+        {transform:'rotateY('+ (direction * 165) +'deg)',filter:'brightness(.9)',opacity:0}
+      ], {duration:800,easing:'cubic-bezier(.32,.05,.24,1)',fill:'forwards'});
+      try { await animation.finished; } catch {}
+    }
+  } finally {
+    leaf?.remove();
+    state.busy = false;
   }
 }
+
 async function connect() {
   try { setStatus('Connecting Google Drive…'); await auth.connect(); await loadAll(); updateCard(); }
   catch(error) { auth.clear(); setStatus(error.message); msg.textContent = error.message; }
