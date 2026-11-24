@@ -14,8 +14,18 @@ try {
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-title-page').waitFor(); assert.equal(await page.locator('.voices-title-page h1').innerText(),'破曉之聲');
  await page.locator('#voicesReader [data-act=bookmark]').click(); await page.waitForFunction(() => document.querySelector('[data-bookmark-count]')?.textContent === '1');
  await page.locator('#voicesReader [data-act=library]').click(); await page.reload(); await page.locator('.voices-card-cover').waitFor(); await page.locator('#bookCard').click(); await page.locator('#nextPage').click(); await page.locator('#book[data-state=content]').waitFor(); assert.equal(await page.locator('#bookmarkCount').innerText(),'0');
- await page.locator('#backLibrary').click(); await page.locator('#voicesCard').click(); await page.locator('#voicesReader .voices-cover-image').waitFor(); await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-title-page').waitFor();
- await page.locator('#voicesReader [data-act=next]').click(); await page.locator('#voicesReader [data-act=next]').click(); assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Back cover');
+ await page.locator('#backLibrary').click(); await page.locator('#voicesCard').click(); await page.locator('.voices-title-page').waitFor();
+ await page.locator('#voicesReader [data-act=next]').click();
+ await page.locator('.voices-prologue-page').waitFor();
+ assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Prologue 1 / 6');
+ await page.locator('[data-toggle="pinyin"]').check();
+ await page.locator('.voices-pinyin').first().waitFor();
+ await page.locator('[data-toggle="translation"]').check();
+ await page.locator('.voices-translation').first().waitFor();
+ await page.locator('.voices-word').first().click();
+ assert.ok((await page.locator('.voices-gloss').innerText()).length > 0);
+ for (let i=0;i<7;i++) await page.locator('#voicesReader [data-act=next]').click();
+ assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Back cover');
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('#library:not([hidden])').waitFor();
- assert.equal(media,5); assert.deepEqual(errors,[]); console.log('Mocked Drive browser flow passed: book selection, assets, resume, bookmarks, sample isolation, back cover.'); await ctx.close();
+ assert.equal(media,5); assert.deepEqual(errors,[]); console.log('Mocked Drive browser flow passed: book selection, assets, six prologue pages, annotations, resume, bookmarks, sample isolation, back cover.'); await ctx.close();
 } finally {await browser.close();}
