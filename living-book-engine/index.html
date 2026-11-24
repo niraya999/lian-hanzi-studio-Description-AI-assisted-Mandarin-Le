@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17231f">
+  <meta name="description" content="A standalone, manifest-driven interactive graphic novel reader.">
+  <title>The Living Book · Engine Preview</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#library" aria-label="The Living Book home">
+        <span class="brand-mark" aria-hidden="true">✳</span>
+        <span><strong>THE LIVING BOOK</strong><small>INTERACTIVE STORY ENGINE</small></span>
+      </a>
+      <div class="top-actions">
+        <label class="language-select"><span class="sr-only">Story language</span>
+          <select id="languageSelect" aria-label="Story language"><option value="en">English</option><option value="id">Bahasa Indonesia</option><option value="zh-Hant">繁體中文</option></select>
+        </label>
+        <button id="layoutToggle" class="icon-button layout-button" type="button" aria-label="Switch page layout" title="Switch page layout"><span aria-hidden="true">▣</span><span id="layoutLabel">Portrait</span></button>
+        <button id="helpButton" class="icon-button help-button" type="button" aria-label="Keyboard shortcuts" title="Keyboard shortcuts">?</button>
+      </div>
+    </header>
+
+    <main id="library" class="library-view">
+      <section class="library-intro">
+        <p class="eyebrow">A QUIET PLACE TO BEGIN AGAIN</p>
+        <h1>Stories made to<br><em>be lived in.</em></h1>
+        <p class="intro-copy">An illustrated book is more than a sequence of pages.<br class="desktop-break"> It is a small world you can return to, exactly where you left it.</p>
+      </section>
+      <section class="shelf" aria-label="Your library">
+        <div class="section-heading"><div><p class="eyebrow">YOUR LIBRARY</p><h2>On the shelf</h2></div><span class="shelf-count">01 STORY</span></div>
+        <button class="book-card" id="bookCard" type="button">
+          <span class="card-cover" aria-hidden="true"><span class="mini-sun"></span><span class="mini-ridge"></span><span class="card-title">A SMALL<br>LIGHT</span><span class="card-author">A SAMPLE STORY</span><span class="card-spine"></span></span>
+          <span class="card-info"><span class="card-tag">DEMO · ORIGINAL SAMPLE</span><strong id="libraryTitle">A Small Light</strong><span id="libraryDescription">A lantern, a winding path, and the warmth of being found.</span><span class="card-meta"><span>3 pages</span><span>·</span><span>3 min</span></span><span class="resume-line" id="resumeLine">New story <span aria-hidden="true">↗</span></span></span>
+        </button>
+        <p class="privacy-note"><span aria-hidden="true">◉</span> Reading progress and bookmarks stay in this browser on this device.</p>
+      </section>
+      <footer class="app-footer"><span>LIAN UNIVERSE · LIVING BOOK ENGINE</span><span>PHASE 1 PREVIEW</span></footer>
+    </main>
+
+    <main id="reader" class="reader-view" hidden>
+      <div class="reader-toolbar">
+        <button id="backLibrary" class="text-button" type="button"><span aria-hidden="true">←</span> <span data-ui="backLibrary">Library</span></button>
+        <div class="reader-title"><span class="reader-kicker" id="chapterKicker">CHAPTER 01</span><strong id="readerBookTitle">A Small Light</strong></div>
+        <div class="reader-tools">
+          <button id="bookmarkButton" class="tool-button" type="button" aria-label="Save bookmark" title="Save bookmark"><span aria-hidden="true">♧</span><span data-ui="bookmark">Bookmark</span></button>
+          <button id="showBookmarks" class="tool-button" type="button" aria-label="Show bookmarks"><span aria-hidden="true">▤</span><span class="bookmark-count" id="bookmarkCount">0</span></button>
+        </div>
+      </div>
+
+      <details class="media-drawer">
+        <summary><span class="media-summary-icon" aria-hidden="true">♫</span><span data-ui="audio">Story audio</span><span class="phase-badge">PHASE 2</span><span class="summary-chevron" aria-hidden="true">⌄</span></summary>
+        <div class="media-options" aria-label="Audio and illustration options">
+          <button class="media-option" type="button" disabled aria-label="Voice narration will be available in Phase 2"><span class="media-icon" aria-hidden="true">◖))</span><span><strong data-ui="narration">Voice narration</strong><small data-ui="notConfigured">Not configured</small></span></button>
+          <button class="media-option" type="button" disabled aria-label="Background music will be available in Phase 2"><span class="media-icon" aria-hidden="true">♫</span><span><strong data-ui="backgroundMusic">Background music</strong><small data-ui="notConfigured">Not configured</small></span></button>
+          <button class="media-option" type="button" disabled aria-label="Moment music will be available in Phase 2"><span class="media-icon" aria-hidden="true">♬</span><span><strong data-ui="momentMusic">Moment music</strong><small data-ui="notConfigured">Not configured</small></span></button>
+          <label class="playlist-option"><span data-ui="playlist">Playlist</span><select disabled aria-label="Story playlist"><option data-ui="noPlaylist">No playlist assigned</option></select></label>
+          <label class="motion-option"><input id="motionToggle" type="checkbox" checked><span class="toggle-track"></span><span data-ui="livingIllustrations">Living illustrations</span></label>
+        </div>
+      </details>
+      <section id="bookStage" class="book-stage" aria-label="Interactive book">
+        <div id="book" class="book" data-layout="portrait" data-state="library">
+          <div class="book-shadow" aria-hidden="true"></div>
+          <div id="openSpread" class="open-spread" aria-live="polite"></div>
+          <div id="coverLeaf" class="cover-leaf" aria-label="Hardcover book cover">
+            <div class="cover-spine" aria-hidden="true"></div>
+            <div class="cover-art" aria-hidden="true"><span class="cover-moon"></span><span class="cover-hill hill-back"></span><span class="cover-hill hill-front"></span><span class="cover-lantern"><i></i></span></div>
+            <div class="cover-copy"><span class="cover-eyebrow">A STORY ABOUT FINDING YOUR WAY</span><h2 id="coverTitle">A Small<br>Light</h2><span class="cover-rule"></span><p id="coverSubtitle">An original sample story<br>made for this preview.</p><span class="cover-edition">THE LIVING BOOK · SAMPLE EDITION</span></div>
+            <button id="openCover" class="open-cover-button" type="button"><span data-ui="openBook">Open book</span><span aria-hidden="true">↗</span></button>
+          </div>
+          <section id="endScreen" class="end-screen" aria-label="End of book" hidden>
+            <div class="end-glow" aria-hidden="true"></div><p class="eyebrow" data-ui="theEnd">THE END</p><h2 id="endTitle">A light is shared<br>by passing it on.</h2><p id="endText">Thank you for spending a little time here.</p>
+            <div class="end-actions"><button id="readAgain" class="primary-button" type="button"><span data-ui="readAgain">Read again</span><span aria-hidden="true">↻</span></button><button id="endLibrary" class="secondary-button" type="button"><span data-ui="backToLibrary">Back to library</span><span aria-hidden="true">→</span></button></div>
+          </section>
+        </div>
+      </section>
+
+      <nav class="page-controls" aria-label="Book navigation">
+        <button id="previousPage" class="page-arrow" type="button" aria-label="Previous page" title="Previous page">←</button>
+        <div class="progress-wrap"><div class="progress-label"><span id="pageLabel">COVER</span><span id="pageCount">0 / 3</span></div><div class="progress-track"><span id="progressBar"></span></div></div>
+        <button id="nextPage" class="page-arrow next" type="button" aria-label="Next page" title="Next page"><span id="nextLabel">Open</span><span aria-hidden="true">→</span></button>
+      </nav>
+      <p class="reader-hint" id="readerHint">Use ← → keys or swipe the page to turn.</p>
+      <div id="bookmarkPopover" class="bookmark-popover" hidden><div class="popover-head"><strong data-ui="savedBookmarks">Saved bookmarks</strong><button id="closeBookmarks" type="button" aria-label="Close bookmarks">×</button></div><div id="bookmarkList" class="bookmark-list"></div></div>
+      <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+  <dialog id="helpDialog" class="help-dialog"><form method="dialog"><button class="dialog-close" aria-label="Close">×</button><p class="eyebrow">A FEW SHORTCUTS</p><h2>Read at your pace.</h2><ul><li><kbd>←</kbd><kbd>→</kbd><span>Turn a page</span></li><li><kbd>Esc</kbd><span>Return to your library</span></li><li><span class="swipe-icon">↔</span><span>Swipe on touchscreens</span></li></ul><p>Your place and bookmarks are saved on this device, for this story.</p><button class="primary-button dialog-done">Got it</button></form></dialog>
+  <script type="module" src="./reader.mjs"></script>
+</body>
+</html>

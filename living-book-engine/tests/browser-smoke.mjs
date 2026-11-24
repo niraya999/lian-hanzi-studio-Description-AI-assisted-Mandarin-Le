@@ -1,0 +1,59 @@
+import { chromium } from 'playwright';
+import { mkdir } from 'node:fs/promises';
+
+const origin = process.env.LIVING_BOOK_URL || 'http://127.0.0.1:4173';
+const output = process.env.LIVING_BOOK_SCREENSHOTS || '/tmp/living-book-engine-screenshots';
+await mkdir(output, { recursive: true });
+const browser = await chromium.launch({ headless: true });
+try {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto(origin);
+  await page.evaluate(() => indexedDB.deleteDatabase('lian-living-book-engine'));
+  await page.reload();
+  await page.locator('#bookCard').click();
+  await page.locator('#openCover').click();
+  await page.locator('.paper-page').waitFor();
+  if (await page.locator('.paper-page').count() !== 1) throw new Error('Portrait mode should display one page.');
+  await page.locator('#nextPage').click();
+  await page.getByText('PAGE 2', { exact: true }).waitFor({ state: 'visible' });
+  await page.locator('#bookmarkButton').click();
+  await page.waitForFunction(() => document.querySelector('#bookmarkCount')?.textContent === '1');
+  await page.screenshot({ path: `${output}/book-portrait.png`, fullPage: true });
+
+  await page.locator('#backLibrary').click();
+  await page.locator('#library').waitFor({ state: 'visible' });
+  await page.locator('#bookCard').click();
+  await page.locator('#openCover').click();
+  await page.getByText('PAGE 2', { exact: true }).waitFor({ state: 'visible' });
+  await page.locator('#previousPage').click();
+  await page.getByText('PAGE 1', { exact: true }).waitFor({ state: 'visible' });
+  await page.locator('#showBookmarks').click();
+  await page.locator('.bookmark-item').click();
+  await page.getByText('PAGE 2', { exact: true }).waitFor({ state: 'visible' });
+  await page.locator('#layoutToggle').click();
+  await page.waitForFunction(() => document.querySelectorAll('.paper-page').length === 2);
+  await page.screenshot({ path: `${output}/book-spread.png`, fullPage: true });
+  await page.locator('#layoutToggle').click();
+  await page.locator('#nextPage').click();
+  await page.getByText('PAGE 3', { exact: true }).waitFor({ state: 'visible' });
+  await page.locator('#nextPage').click();
+  await page.locator('#book[data-state="end"]').waitFor({ state: 'visible' });
+  await page.screenshot({ path: `${output}/book-end.png`, fullPage: true });
+  await page.locator('#readAgain').click();
+  await page.getByText('PAGE 1', { exact: true }).waitFor({ state: 'visible' });
+  await page.locator('#backLibrary').click();
+  await page.locator('#library').waitFor({ state: 'visible' });
+  await context.close();
+
+  const desktop = await browser.newContext({ viewport: { width: 1440, height: 960 }, reducedMotion: 'reduce' });
+  const wide = await desktop.newPage();
+  await wide.goto(origin);
+  await wide.locator('#bookCard').click();
+  await wide.locator('#openCover').click();
+  await wide.waitForFunction(() => document.querySelectorAll('.paper-page').length === 2);
+  if (await wide.locator('#book').getAttribute('data-layout') !== 'spread') throw new Error('Wide landscape should default to a two-page spread.');
+  await wide.screenshot({ path: `${output}/book-landscape.png`, fullPage: true });
+  await desktop.close();
+  console.log(`Browser smoke passed. Screenshots saved to ${output}`);
+} finally { await browser.close(); }
