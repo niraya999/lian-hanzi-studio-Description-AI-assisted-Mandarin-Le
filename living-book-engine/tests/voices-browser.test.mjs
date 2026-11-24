@@ -9,7 +9,7 @@ try {
  await page.route('https://www.googleapis.com/**',async r=>{const url=r.request().url(); if(unauthorized) return r.fulfill({status:401}); if(url.includes('/about?'))return r.fulfill({json:{user:{permissionId:'mock-account',emailAddress:'martin@installindonesia.org'}}}); if(url.includes('alt=media')){media++;return r.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZ0AAAAASUVORK5CYII=','base64')});}return r.fulfill({json:{mimeType:'image/png',md5Checksum:'v1'}});});
  await page.goto('http://127.0.0.1:4318/'); await page.locator('#voicesConnect').waitFor();
  await page.locator('#voicesConnect').click(); await page.locator('.voices-card-cover').waitFor();
- await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden]) .voices-cover-image').waitFor(); assert.equal(media,5);
+ await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden]) .voices-cover-image').waitFor(); assert.equal(media,6);
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-inner').waitFor();
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-title-page').waitFor(); assert.equal(await page.locator('.voices-title-page h1').innerText(),'破曉之聲');
  await page.locator('#voicesReader [data-act=bookmark]').click(); await page.waitForFunction(() => document.querySelector('[data-bookmark-count]')?.textContent === '1');
@@ -18,6 +18,8 @@ try {
  await page.locator('#voicesReader [data-act=next]').click();
  await page.locator('.voices-prologue-page').waitFor();
  assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Prologue 1 / 6');
+ await page.locator('.voices-page-illustration').waitFor();
+ assert.equal(await page.locator('.voices-art-pending').count(),0);
  await page.locator('[data-toggle="pinyin"]').check();
  await page.locator('.voices-pinyin').first().waitFor();
  await page.locator('[data-toggle="translation"]').check();
@@ -27,5 +29,5 @@ try {
  for (let i=0;i<7;i++) await page.locator('#voicesReader [data-act=next]').click();
  assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Back cover');
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('#library:not([hidden])').waitFor();
- assert.equal(media,5); assert.deepEqual(errors,[]); console.log('Mocked Drive browser flow passed: book selection, assets, six prologue pages, annotations, resume, bookmarks, sample isolation, back cover.'); await ctx.close();
+ assert.equal(media,6); assert.deepEqual(errors,[]); console.log('Mocked Drive browser flow passed: book selection, assets, six prologue pages, annotations, resume, bookmarks, sample isolation, back cover.'); await ctx.close();
 } finally {await browser.close();}
