@@ -50,6 +50,7 @@ function updateLibrary(state) {
 }
 
 function render(state) {
+  if (document.querySelector('#voicesReader')?.hidden === false) return;
   const onReader = state.screen !== 'library' && state.screen !== 'closed';
   libraryView.hidden = onReader;
   readerView.hidden = !onReader;
@@ -104,9 +105,9 @@ function updateBookmarks(bookmarks) {
   }
 }
 
-function setLocale(next) { locale = STRINGS[next] ? next : 'en'; document.documentElement.lang = locale; document.querySelectorAll('[data-ui]').forEach(node => { node.textContent = text(node.dataset.ui); }); if (engine) render(engine.getState()); }
+function setLocale(next) { locale = STRINGS[next] ? next : 'en'; document.documentElement.lang = locale; document.querySelectorAll('[data-ui]').forEach(node => { node.textContent = text(node.dataset.ui); }); if (engine && (document.querySelector('#voicesReader')?.hidden !== false)) render(engine.getState()); }
 
-async function toggleLayout() { explicitLayout = true; preferredLayout = engine.getState().layout === 'portrait' ? 'spread' : 'portrait'; await engine.setLayout(preferredLayout); }
+async function toggleLayout() { if (!document.querySelector('#voicesReader')?.hidden) return; explicitLayout = true; preferredLayout = engine.getState().layout === 'portrait' ? 'spread' : 'portrait'; await engine.setLayout(preferredLayout); }
 
 async function closeReader() { await engine.returnToLibrary(); $('#bookmarkPopover').hidden = true; }
 
