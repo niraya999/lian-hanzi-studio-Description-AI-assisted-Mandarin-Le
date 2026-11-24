@@ -31,12 +31,16 @@
         <p class="intro-copy">An illustrated book is more than a sequence of pages.<br class="desktop-break"> It is a small world you can return to, exactly where you left it.</p>
       </section>
       <section class="shelf" aria-label="Your library">
-        <div class="section-heading"><div><p class="eyebrow">YOUR LIBRARY</p><h2>On the shelf</h2></div><span class="shelf-count">01 STORY</span></div>
+        <div class="section-heading"><div><p class="eyebrow">YOUR LIBRARY</p><h2>On the shelf</h2></div><span class="shelf-count">02 STORIES</span></div>
         <button class="book-card" id="bookCard" type="button">
           <span class="card-cover" aria-hidden="true"><span class="mini-sun"></span><span class="mini-ridge"></span><span class="card-title">A SMALL<br>LIGHT</span><span class="card-author">A SAMPLE STORY</span><span class="card-spine"></span></span>
           <span class="card-info"><span class="card-tag">DEMO · ORIGINAL SAMPLE</span><strong id="libraryTitle">A Small Light</strong><span id="libraryDescription">A lantern, a winding path, and the warmth of being found.</span><span class="card-meta"><span>3 pages</span><span>·</span><span>3 min</span></span><span class="resume-line" id="resumeLine">New story <span aria-hidden="true">↗</span></span></span>
         </button>
-        <p class="privacy-note"><span aria-hidden="true">◉</span> Reading progress and bookmarks stay in this browser on this device.</p>
+        <button class="book-card" id="voicesCard" type="button" aria-describedby="voicesStatus">
+<span class="card-cover" style="background:#14243d;color:#e5c88d"><span class="card-title">破曉之聲<br>VOICES OF DAWN</span><span class="card-author">LIAN UNIVERSE</span><span class="card-spine"></span></span>
+<span class="card-info"><span class="card-tag">GRAPHIC NOVEL · PROLOGUE PILOT</span><strong>Voices of Dawn</strong><span id="voicesStatus">Cover integration in preparation</span></span>
+</button>
+<p class="privacy-note"><span aria-hidden="true">◉</span> Reading progress and bookmarks stay in this browser on this device.</p>
       </section>
       <footer class="app-footer"><span>LIAN UNIVERSE · LIVING BOOK ENGINE</span><span>PHASE 1 PREVIEW</span></footer>
     </main>
@@ -90,5 +94,6 @@
   </div>
   <dialog id="helpDialog" class="help-dialog"><form method="dialog"><button class="dialog-close" aria-label="Close">×</button><p class="eyebrow">A FEW SHORTCUTS</p><h2>Read at your pace.</h2><ul><li><kbd>←</kbd><kbd>→</kbd><span>Turn a page</span></li><li><kbd>Esc</kbd><span>Return to your library</span></li><li><span class="swipe-icon">↔</span><span>Swipe on touchscreens</span></li></ul><p>Your place and bookmarks are saved on this device, for this story.</p><button class="primary-button dialog-done">Got it</button></form></dialog>
   <script type="module" src="./reader.mjs"></script>
+<script type="module" src="./voices-preview.mjs"></script>
 </body>
 </html>

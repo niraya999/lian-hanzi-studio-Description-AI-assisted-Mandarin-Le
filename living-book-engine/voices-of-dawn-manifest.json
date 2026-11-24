@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "bookId": "voices-of-dawn-v1",
+  "kind": "graphic-novel",
+  "status": "cover-integration",
+  "title": {
+    "en": "Voices of Dawn",
+    "id": "Voices of Dawn",
+    "zh-Hant": "破曉之聲"
+  },
+  "assets": {
+    "provider": "google-drive",
+    "folderId": "1F7R8ax-m7uOcCmEWCIB3WPv6dgNumZYY",
+    "frontCover": "1j_TZyHEJr4xoT3_KqnoLaBcjHsHjSn0h",
+    "backCover": "177cYJ7JtkgfcDUWgYWFMuoRGpbZG0tU0",
+    "spine": "1vcl1SbJop10SgwOvWpGR56nOPIBsklXg",
+    "innerCover": "1-Uk34jBkqeF_rJ0rd9YyATvDmWGT-_0k",
+    "paperTexture": "1xa-oVjLLKSC7BrU_YR5MmY8pl5eUpItH"
+  },
+  "chapters": [],
+  "playlists": [],
+  "tracks": []
+}
