@@ -16,9 +16,10 @@
       "id": "prologue-p01",
       "next_page_id": "prologue-p02",
       "illustration": {
-        "status": "approved_asset_missing",
-        "drive_file_id": null,
-        "brief": "Wide cinematic view of peaceful mountain village, stream, morning cooking smoke; recover approved Page 01 v2, do not replace.",
+        "status": "approved",
+        "asset_id": "vod-prologue-opening-v1",
+        "drive_file_id": "1fpXBG-LTsd0cKSQ8Y7g4W4zOBJ3PXiIl",
+        "brief": "Approved cinematic opening panorama: dawn over ancient settlement, mountains, mist, Buddha statue and autumn foliage. Opening visual, not a replacement for the earlier Page 01 v2 reference.",
         "aspect_ratio": "2:1"
       },
       "audio": {
