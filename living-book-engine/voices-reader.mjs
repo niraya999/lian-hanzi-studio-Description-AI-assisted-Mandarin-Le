@@ -76,27 +76,7 @@ async function move(delta) {
     state.stage = Number.isInteger(progress?.pageIndex) ? Math.max(1,Math.min(3,progress.pageIndex)) : 1;
   } else state.stage = Math.max(0,Math.min(4,state.stage + delta));
   if (state.stage >= 1 && state.stage <= 3) await storage.saveProgress(state.manifest.bookId,{pageIndex:state.stage,updatedAt:Date.now()});
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const stage = book.parentElement;
-  const before = book.getBoundingClientRect();
-  const leaf = reduced ? null : book.cloneNode(true);
-  if (leaf) {
-    const bounds = stage.getBoundingClientRect();
-    leaf.removeAttribute('tabindex'); leaf.setAttribute('aria-hidden', 'true');
-    leaf.className = 'voices-book voices-turn-leaf';
-    Object.assign(leaf.style, {left: (before.left - bounds.left) + 'px', top: (before.top - bounds.top) + 'px', width: before.width + 'px', height: before.height + 'px'});
-    stage.append(leaf);
-  }
-  render();
-  if (leaf) {
-    state.busy = true;
-    const anim = leaf.animate(
-      [{transform: 'perspective(1600px) rotateY(0deg)', opacity: 1},
-       {transform: 'perspective(1600px) rotateY(' + (delta > 0 ? '-95deg' : '95deg') + ')', opacity: 0.4}],
-      {duration: 650, easing: 'ease-in-out', fill: 'forwards'}
-    );
-    try { await anim.finished; } catch {} finally { leaf.remove(); state.busy = false; }
-  }
+  book.classList.remove('voices-turn'); void book.offsetWidth; book.classList.add('voices-turn'); render();
 }
 async function connect() {
   try { setStatus('Connecting Google Drive…'); await auth.connect(); await loadAll(); updateCard(); }
