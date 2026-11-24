@@ -13,7 +13,7 @@ try {
   await page.screenshot({ path: `${output}/book-library.png`, fullPage: true });
   await page.locator('#bookCard').click();
   await page.locator('#book[data-state="cover"]').waitFor({ state: 'visible' });
-  await page.locator('#openCover').click();
+  await page.locator('#nextPage').click();
   await page.locator('#book[data-state="content"]').waitFor({ state: 'visible' });
   await page.locator('.paper-page').waitFor({ state: 'visible' });
   if (await page.locator('.paper-page').count() !== 1) throw new Error('Portrait mode should display one page.');
@@ -26,7 +26,7 @@ try {
   await page.locator('#backLibrary').click();
   await page.locator('#library').waitFor({ state: 'visible' });
   await page.locator('#bookCard').click();
-  await page.locator('#openCover').click();
+  await page.locator('#nextPage').click();
   await page.getByText('PAGE 2', { exact: true }).waitFor({ state: 'visible' });
   await page.locator('#previousPage').click();
   await page.getByText('PAGE 1', { exact: true }).waitFor({ state: 'visible' });
@@ -52,7 +52,7 @@ try {
   const wide = await desktop.newPage();
   await wide.goto(origin);
   await wide.locator('#bookCard').click();
-  await wide.locator('#openCover').click();
+  await wide.locator('#nextPage').click();
   await wide.waitForFunction(() => document.querySelectorAll('.paper-page').length === 2);
   if (await wide.locator('#book').getAttribute('data-layout') !== 'spread') throw new Error('Wide landscape should default to a two-page spread.');
   await wide.screenshot({ path: `${output}/book-landscape.png`, fullPage: true });
