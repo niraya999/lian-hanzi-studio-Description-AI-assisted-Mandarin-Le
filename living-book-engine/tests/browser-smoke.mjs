@@ -59,6 +59,7 @@ try {
   await wide.locator('#nextPage').click();
   await wide.waitForFunction(() => document.querySelectorAll('.paper-page').length === 2);
   if (await wide.locator('#book').getAttribute('data-layout') !== 'spread') throw new Error('Wide landscape should default to a two-page spread.');
+  await wide.waitForTimeout(700);
   await wide.screenshot({ path: `${output}/book-landscape.png`, fullPage: true });
   await desktop.close();
   console.log(`Browser smoke passed. Screenshots saved to ${output}`);
