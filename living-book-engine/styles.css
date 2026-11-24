@@ -24,3 +24,9 @@
 
 .voices-book-stage{position:relative}.voices-turn-leaf{position:absolute!important;z-index:5;max-width:none!important;max-height:none!important;pointer-events:none;transform-origin:left center;backface-visibility:hidden}
 .voices-book-stage:has(.voices-turn-leaf[data-layout=spread]) .voices-turn-leaf{transform-origin:center center}
+
+/* Single leaf turning above the stationary book. */
+.voices-page-leaf{position:absolute;z-index:6;overflow:hidden;pointer-events:none;backface-visibility:hidden;transform-style:preserve-3d;box-shadow:3px 0 14px #0005}
+.voices-page-snapshot{position:absolute;top:0;display:flex;justify-content:center;max-width:none!important;max-height:none!important;filter:none;overflow:hidden}
+.voices-page-snapshot .voices-hardcover{flex:0 0 100%;width:100%;height:100%}
+.voices-page-snapshot[data-layout=spread][data-stage="1"]>* ,.voices-page-snapshot[data-layout=spread][data-stage="2"]>* ,.voices-page-snapshot[data-layout=spread][data-stage="3"]>*{flex:0 0 50%;width:50%;max-width:50%;height:100%}
