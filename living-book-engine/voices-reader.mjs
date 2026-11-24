@@ -79,14 +79,14 @@ async function move(delta) {
   book.classList.remove('voices-turn'); void book.offsetWidth; book.classList.add('voices-turn'); render();
 }
 async function connect() {
-  try { setStatus('Connecting Google Drive…'); const session = await auth.connect(); if (session.email?.toLowerCase() !== 'martin@installindonesia.org') throw new Error('Please connect martin@installindonesia.org.'); await loadAll(); updateCard(); }
+  try { setStatus('Connecting Google Drive…'); await auth.connect(); await loadAll(); updateCard(); }
   catch(error) { auth.clear(); setStatus(error.message); msg.textContent = error.message; }
 }
 function updateCard() { if (!state.urls.frontCover) return; const old=card.querySelector('.card-cover'); const img=image(state.urls.frontCover,'voices-card-cover','Voices of Dawn front cover'); if(old) old.replaceWith(img); }
 const connectButton = document.createElement('button'); connectButton.type='button'; connectButton.id='voicesConnect'; connectButton.className='secondary-button voices-connect'; connectButton.textContent='Connect Google Drive'; card.after(connectButton);
 connectButton.addEventListener('click', connect);
 card.addEventListener('click', async () => {
-  try { const session = await auth.getAccessToken(); if (session.email?.toLowerCase() !== 'martin@installindonesia.org') throw new Error('Choose the requested account.'); } catch { setStatus(t('required')); connectButton.focus(); return; }
+  try { await auth.getAccessToken(); } catch { setStatus(t('required')); connectButton.focus(); return; }
   try { state.stage=0; state.bookmarks=await storage.listBookmarks(state.manifest.bookId); library.hidden=true; view.hidden=false; await loadAll(); render(); }
   catch(error) { view.hidden=true; library.hidden=false; connectButton.focus(); }
 });
@@ -102,5 +102,5 @@ try {
   state.manifest = await response.json();
   if (!state.manifest.bookId || state.manifest.assets?.provider !== 'google-drive') throw new Error('Invalid book manifest.');
   setStatus(t('required'));
-  try { const session=await auth.getAccessToken(); if(session.email?.toLowerCase()!=='martin@installindonesia.org') throw new Error('Please connect martin@installindonesia.org.'); state.urls.frontCover=await loadAsset('frontCover'); updateCard(); setStatus(t('ready')); } catch { /* a user gesture is needed to connect */ }
+  try { await auth.getAccessToken(); state.urls.frontCover=await loadAsset('frontCover'); updateCard(); setStatus(t('ready')); } catch { /* a user gesture is needed to connect */ }
 } catch(error) { card.disabled=true; connectButton.disabled=true; setStatus(error.message); }
