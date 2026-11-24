@@ -98,6 +98,7 @@ function render() {
   view.querySelector('[data-act=next]').textContent = t(state.stage === lastStage() ? 'library' : 'next');
   view.querySelector('[data-act=bookmark]').disabled = state.stage < 2 || state.stage >= lastStage()-1;
   view.querySelector('[data-act=library]').textContent = '← ' + t('library');
+  readingTools.hidden = !pageAtStage();
   refreshBookmarks();
 }
 async function loadAsset(name) { return loader.load({bookId:state.manifest.bookId,fileId:safeAsset(name)}); }
@@ -105,6 +106,10 @@ async function loadAll() {
   state.busy = true; msg.textContent = t('pending');
   try {
     for (const key of ['frontCover','backCover','spine','innerCover','paperTexture']) if (!state.urls[key]) state.urls[key] = await loadAsset(key);
+    for (const page of state.prologue?.pages || []) if (page.illustration?.drive_file_id && !state.urls[page.id]) {
+      try { state.urls[page.id] = await loader.load({bookId:state.manifest.bookId,fileId:page.illustration.drive_file_id}); }
+      catch (error) { console.warn('Illustration unavailable:', page.id, error); }
+    }
     msg.textContent = ''; setStatus(t('ready')); render();
   } catch (error) { msg.textContent = error.code === 'AUTH_REQUIRED' ? t('reconnect') : `${error.message} — ${t('connect')}`; setStatus(t('required')); throw error; }
   finally { state.busy = false; }
@@ -117,10 +122,10 @@ async function move(delta) {
   if (state.busy) return;
   if (state.stage === lastStage() && delta > 0) return returnLibrary();
   if (state.stage === 0 && delta > 0) {
-    const progress = await storage.getProgress(state.manifest.bookId);
-    state.stage = Number.isInteger(progress?.pageIndex) ? Math.max(1,Math.min(lastStage()-1,progress.pageIndex)) : 1;
+    state.stage = 1;
   } else state.stage = Math.max(0,Math.min(lastStage(),state.stage + delta));
-  if (state.stage >= 1 && state.stage <= 3) await storage.saveProgress(state.manifest.bookId,{pageIndex:state.stage,updatedAt:Date.now()});
+  if (state.stage >= 1 && state.stage < lastStage()) await storage.saveProgress(state.manifest.bookId,{pageIndex:state.stage,updatedAt:Date.now()});
+  readingTools.hidden = !pageAtStage();
   book.classList.remove('voices-turn'); void book.offsetWidth; book.classList.add('voices-turn'); render();
 }
 async function connect() {
@@ -132,7 +137,7 @@ const connectButton = document.createElement('button'); connectButton.type='butt
 connectButton.addEventListener('click', connect);
 card.addEventListener('click', async () => {
   try { await auth.getAccessToken(); } catch { setStatus(t('required')); connectButton.focus(); return; }
-  try { state.stage=0; state.bookmarks=await storage.listBookmarks(state.manifest.bookId); library.hidden=true; view.hidden=false; await loadAll(); render(); }
+  try { const progress=await storage.getProgress(state.manifest.bookId); state.stage=Number.isInteger(progress?.pageIndex)?Math.max(0,Math.min(lastStage()-1,progress.pageIndex)):0; state.bookmarks=await storage.listBookmarks(state.manifest.bookId); library.hidden=true; view.hidden=false; await loadAll(); render(); }
   catch(error) { view.hidden=true; library.hidden=false; connectButton.focus(); }
 });
 view.addEventListener('click', async e => { const action=e.target.closest('[data-act]')?.dataset.act; if (!action) return; try { if(action==='library') await returnLibrary(); else if(action==='next') await move(1); else if(action==='previous') await move(-1); else if(action==='bookmarks') { bookmarkPanel.hidden=!bookmarkPanel.hidden; refreshBookmarks(); } else if(action==='bookmark' && state.stage>=2 && state.stage<lastStage()-1) { await storage.addBookmark(state.manifest.bookId,{pageId:pageAtStage()?.id || 'title-page',pageIndex:state.stage,chapterId:pageAtStage()?'prologue':'front-matter',label:pageAtStage()?.id || t('bookmark'),createdAt:Date.now()}); state.bookmarks=await storage.listBookmarks(state.manifest.bookId); msg.textContent=t('saved'); refreshBookmarks(); } } catch(error) { msg.textContent=error.message; } });
