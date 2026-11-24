@@ -61,16 +61,24 @@ jobs:
                   file = Path(tmp) / f'inline-{i}.js'
                   file.write_text(script)
                   subprocess.run(['node','--check',str(file)],check=True)
-          for path in ('bcs/bcs-native.js','bcs/deity-gallery.js','sw.js','word-of-the-day.js','verified-words.js'):
+          for path in ('bcs/bcs-native.js','bcs/deity-gallery.js','sw.js','word-of-the-day.js','verified-words.js','audio-recording-ui.js','audio-capture.worklet.js','mp3-encoder.worker.js'):
               subprocess.run(['node','--check',path],check=True)
+          subprocess.run(['node','--check','audio-recording-engine.mjs'],check=True)
+          assert 'id="enableAudioRecording"' in html
+          assert 'lhs-shell-v125' in sw
           print('BCS integration and JavaScript syntax checks passed')
           PY
+      - name: Run recording engine tests
+        run: |
+          node --test tests/audio-recording-engine.test.mjs
+          python3 -m unittest discover -s tests -p 'test_*.py'
       - name: Browser smoke test (mobile viewport)
         run: |
           npm install --no-save playwright
           npx playwright install --with-deps chromium
           python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/lhs-http.log 2>&1 &
           node scripts/bcs-browser-smoke.cjs
+          node scripts/recording-browser-smoke.cjs
       - name: Upload mobile browser screenshot
         if: always()
         uses: actions/upload-artifact@v4
@@ -85,7 +93,9 @@ jobs:
           export SOURCE_SHA="$(git rev-parse HEAD)"
           echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
           mkdir -p dist
-          cp index.html word-of-the-day.js verified-words.js sw.js manifest.webmanifest icon.svg landscape.svg dist/
+          cp index.html word-of-the-day.js verified-words.js sw.js manifest.webmanifest icon.svg landscape.svg audio-recording-ui.js audio-recording-engine.mjs audio-capture.worklet.js mp3-encoder.worker.js dist/
+          mkdir -p dist/vendor/audio
+          cp vendor/audio/lamejs.iife.js vendor/audio/LGPL-3.0.txt dist/vendor/audio/
           mkdir -p dist/bcs
           cp bcs/bcs-native.js bcs/deity-gallery.js dist/bcs/
           python3 scripts/stamp-build.py --html dist/index.html --commit "$SOURCE_SHA" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -95,6 +105,9 @@ jobs:
           html = Path('dist/index.html').read_text()
           assert f'name="lhs-commit" content="{os.environ["SOURCE_SHA"]}"' in html
           assert 'name="lhs-build-date" content="20' in html
+          assert 'id="enableAudioRecording"' in html
+          assert Path('dist/audio-recording-engine.mjs').is_file()
+          assert Path('dist/vendor/audio/lamejs.iife.js').is_file()
           print('Build metadata verified')
           PY
       - uses: actions/upload-artifact@v4

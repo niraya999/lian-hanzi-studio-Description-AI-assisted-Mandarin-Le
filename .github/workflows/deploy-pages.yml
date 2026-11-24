@@ -15,7 +15,9 @@ jobs:
           mkdir -p dist/bcs dist/lcf
           cp bcs/bcs-native.js bcs/deity-gallery.js dist/bcs/
           cp lcf/index.html lcf/app.js lcf/style.css lcf/articles.json dist/lcf/
-          cp index.html word-of-the-day.js verified-words.js home-card-images.js home-menu-config.json sw.js manifest.webmanifest icon.svg landscape.svg CNAME dist/
+          cp index.html word-of-the-day.js verified-words.js home-card-images.js home-menu-config.json sw.js manifest.webmanifest icon.svg landscape.svg CNAME audio-recording-ui.js audio-recording-engine.mjs audio-capture.worklet.js mp3-encoder.worker.js dist/
+          mkdir -p dist/vendor/audio
+          cp vendor/audio/lamejs.iife.js vendor/audio/LGPL-3.0.txt dist/vendor/audio/
           python3 scripts/stamp-build.py --html dist/index.html --commit "$(git rev-parse HEAD)" --date "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           grep -q 'Lian Hanzi Studio' dist/index.html
           grep -q 'bcs/bcs-native.js?v=2' dist/index.html
@@ -29,6 +31,10 @@ jobs:
           test -s dist/lcf/index.html
           test -s dist/lcf/articles.json
           grep -q 'id="openLcfModule"' dist/index.html
+          grep -q 'id="enableAudioRecording"' dist/index.html
+          grep -q 'lhs-shell-v125' dist/sw.js
+          test -s dist/audio-recording-engine.mjs
+          test -s dist/vendor/audio/lamejs.iife.js
       - uses: actions/upload-artifact@v4
         with:
           name: lhs-site-validation

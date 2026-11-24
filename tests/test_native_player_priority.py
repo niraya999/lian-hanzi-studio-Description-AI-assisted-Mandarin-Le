@@ -2,7 +2,7 @@ import pathlib,unittest
 page=(pathlib.Path(__file__).resolve().parents[1]/'index.html').read_text(encoding='utf-8')
 class NativePriority(unittest.TestCase):
  def test_mp3_is_preferred_even_with_suno_link(self):
-  self.assertIn("if(!audio)window.loadSuno(url)",page)
+  self.assertIn("if(!audio){window.loadSuno(url)",page)
   self.assertIn("window.setupNativeTrack?.(audio?async()=>",page)
   self.assertIn("else{el('sunoOpen').href=url;el('sunoOpen').hidden=false;}",page)
  def test_slideshow_immediately_precedes_audio(self):
