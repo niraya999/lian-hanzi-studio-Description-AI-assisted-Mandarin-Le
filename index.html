@@ -87,10 +87,30 @@ body>header,body>section,body>.hero,body>main{min-width:0}
 
 #playerSlideshow{width:min(100%,660px);margin:14px auto 22px}#playerSlideshow[hidden]{display:none!important}
 .slide-stage{position:relative;aspect-ratio:1;max-height:min(62vh,640px);background:#172237;border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
-#playerSlideImage{width:100%;height:100%;object-fit:contain;transition:opacity .25s ease}
+#playerSlideImage{width:100%;height:100%;object-fit:contain;will-change:opacity,transform,filter}
+#playerSlideImage.slide-animate{animation-duration:1s;animation-fill-mode:both;animation-timing-function:cubic-bezier(.22,.61,.36,1)}
+#playerSlideImage.slide-crossfade{animation-name:lhsCrossfade}
+#playerSlideImage.slide-blackout{animation-name:lhsBlackout}
+#playerSlideImage.slide-zoom-in{animation-name:lhsZoomIn}
+#playerSlideImage.slide-zoom-out{animation-name:lhsZoomOut}
+#playerSlideImage.slide-left{animation-name:lhsSlideLeft}
+#playerSlideImage.slide-right{animation-name:lhsSlideRight}
+#playerSlideImage.slide-rise{animation-name:lhsRise}
+#playerSlideImage.slide-blur{animation-name:lhsBlur}
+#playerSlideImage.slide-tilt{animation-name:lhsTilt}
+@keyframes lhsCrossfade{from{opacity:0}to{opacity:1}}
+@keyframes lhsBlackout{0%{opacity:0;filter:brightness(0)}45%{opacity:.45;filter:brightness(.35)}100%{opacity:1;filter:brightness(1)}}
+@keyframes lhsZoomIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+@keyframes lhsZoomOut{from{opacity:0;transform:scale(1.1)}to{opacity:1;transform:scale(1)}}
+@keyframes lhsSlideLeft{from{opacity:0;transform:translateX(7%)}to{opacity:1;transform:translateX(0)}}
+@keyframes lhsSlideRight{from{opacity:0;transform:translateX(-7%)}to{opacity:1;transform:translateX(0)}}
+@keyframes lhsRise{from{opacity:0;transform:translateY(7%)}to{opacity:1;transform:translateY(0)}}
+@keyframes lhsBlur{from{opacity:0;filter:blur(14px)}to{opacity:1;filter:blur(0)}}
+@keyframes lhsTilt{from{opacity:0;transform:scale(1.06) rotate(-2deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+
 .slide-controls{display:flex;justify-content:center;align-items:center;gap:16px;margin:8px 0;color:#aebfda}.slide-controls button{border:1px solid #50627c;background:#1b2941;color:#fff;border-radius:8px;padding:5px 12px;cursor:pointer}
 @media(max-width:600px){#playerSlideshow{width:100%}.slide-stage{max-height:55dvh}.slide-stage button{width:36px;height:36px}}
-@media(prefers-reduced-motion:reduce){#playerSlideImage{transition:none}}
+@media(prefers-reduced-motion:reduce){#playerSlideImage,#playerSlideImage.slide-animate{animation:none!important;transition:none!important}}
 #nativeAudioPanel{margin:14px 0;padding:12px;background:#20222c;border-radius:12px}#nativeAudioPanel[hidden]{display:none!important}.auto-next-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-top:10px}.auto-next-row label{display:flex;align-items:center;gap:8px}.auto-next-row button{padding:8px 12px;border-radius:9px}#playlistPosition{color:#b7c4d7;font-size:13px}#playerMain{width:min(100%,720px);margin-inline:auto}#playerSlideshow{margin-bottom:8px}#playerSlideshow .slide-controls{margin:7px 0 12px}#player.native-playing #sunoIntro,#player.native-playing #sunoForm,#player.native-playing #sunoStatus,#player.native-playing #sunoFrame,#player.native-playing #sunoModeNotice{display:none!important}#player.native-playing #playerActions{display:flex;align-items:center;gap:8px;margin:8px 0}#player.native-playing #playerActions p{margin:0}#player.native-playing #previewArt{margin:0}#player.native-playing #playerMain>small{display:none}#nativeAudioPanel{margin:10px 0 8px;padding:14px;background:#1d202b;border:1px solid #343746;border-radius:16px}#nativeTrackAudio{display:block;width:100%;height:54px;max-width:100%;color-scheme:dark}.auto-next-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px}.auto-next-row label{display:inline-flex;align-items:center;gap:7px;flex:1 1 auto;font-size:14px;white-space:nowrap}.auto-next-row input{accent-color:#b8a8ee;width:17px;height:17px}.auto-next-row button{flex:0 0 auto;border-radius:10px;padding:9px 13px;font-size:14px}.auto-next-row #playlistPosition{flex:0 0 auto;margin-left:auto;font-variant-numeric:tabular-nums;font-size:13px}@media(max-width:440px){#nativeAudioPanel{padding:11px}.auto-next-row{gap:8px}.auto-next-row label{font-size:13px}.auto-next-row button{padding:8px 10px}.auto-next-row #playlistPosition{margin-left:0}}#player #sunoExtras{margin:20px 0 8px;padding-top:14px;border-top:1px solid #30323d}#player #sunoExtras #sunoIntro{font-size:13px;color:#a7a8b5;margin:0 0 9px}#player #sunoExtras #sunoForm{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#player #sunoExtras #sunoUrl{flex:1 1 220px;min-width:0}#player #sunoExtras #sunoStatus{font-size:12px}#player #nativeAudioPanel{margin-top:8px}#player #sunoFrame{margin-top:8px}#player.native-playing #sunoExtras{display:none!important}@media(max-width:600px){#player #sunoExtras{margin-top:14px}#player #sunoExtras #sunoForm{gap:7px}}
 /* Compact, aligned player toolbar: autoplay, previous/next and queue position on one line. */
 #nativeAudioPanel .auto-next-row{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;min-width:0}
@@ -222,9 +242,22 @@ let deferred;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault(
 const el=id=>document.getElementById(id),box=el('playerSlideshow'),img=el('playerSlideImage');
 let loaders=[],urls=[],index=0,timer=null,rev=0,paused=false;
 const stop=()=>{if(timer){clearInterval(timer);timer=null;}};
-const show=i=>{if(!urls.length)return;index=(i+urls.length)%urls.length;img.src=urls[index];el('slidePosition').textContent=(index+1)+' / '+urls.length;};
+const effects=['crossfade','blackout','zoom-in','zoom-out','left','right','rise','blur','tilt'];
+let transitionStep=0;
+const show=i=>{
+ if(!urls.length)return;
+ index=(i+urls.length)%urls.length;
+ img.className='';
+ img.src=urls[index];
+ if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&urls.length>1){
+  const effect=effects[transitionStep++%effects.length];
+  void img.offsetWidth; // Restart CSS animation for consecutive slides.
+  img.className='slide-animate slide-'+effect;
+ }
+ el('slidePosition').textContent=(index+1)+' / '+urls.length;
+};
 const schedule=()=>{stop();if(!paused&&urls.length>1&&!document.hidden&&!matchMedia('(prefers-reduced-motion: reduce)').matches)timer=setInterval(()=>show(index+1),5000);};
-window.resetPlayerSlides=()=>{rev++;stop();for(const url of urls)URL.revokeObjectURL(url);urls=[];loaders=[];index=0;paused=false;img.removeAttribute('src');box.hidden=true;el('slidePause').setAttribute('aria-pressed','false');};
+window.resetPlayerSlides=()=>{rev++;stop();for(const url of urls)URL.revokeObjectURL(url);urls=[];loaders=[];index=0;transitionStep=0;paused=false;img.className='';img.removeAttribute('src');box.hidden=true;el('slidePause').setAttribute('aria-pressed','false');};
 window.setPlayerSlides=async next=>{
  window.resetPlayerSlides();loaders=next.slice(0,24);const n=rev;
  if(!loaders.length)return;
