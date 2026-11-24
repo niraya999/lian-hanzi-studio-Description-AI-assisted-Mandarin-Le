@@ -21,6 +21,3 @@
 .voices-book[data-layout=portrait] .voices-inner,.voices-book[data-layout=portrait] .voices-blank-paper,.voices-book[data-layout=portrait] .voices-title-page{flex:0 0 100%;width:100%;max-width:100%;height:100%}
 .voices-book[data-layout=spread] .voices-inner,.voices-book[data-layout=spread] .voices-blank-paper,.voices-book[data-layout=spread] .voices-title-page{flex:0 0 50%;width:50%;max-width:50%;height:100%}
 @media(max-width:760px){.voices-book-stage{overflow:hidden}.voices-book{width:min(90vw,48vh)}.voices-book[data-layout=spread]{width:min(95vw,96vh)}.voices-book[data-stage="0"],.voices-book[data-stage="4"]{width:min(90vw,48vh)}}
-
-.voices-book-stage{position:relative}.voices-turn-leaf{position:absolute!important;z-index:5;max-width:none!important;max-height:none!important;pointer-events:none;transform-origin:left center;backface-visibility:hidden}
-.voices-book-stage:has(.voices-turn-leaf[data-layout=spread]) .voices-turn-leaf{transform-origin:center center}
