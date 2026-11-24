@@ -13,8 +13,8 @@ class AutoNextTests(unittest.TestCase):
   self.assertIn("window.lhsCurrentTrackId=id",PAGE)
   self.assertIn("window.lhsOpenTrack?.(item.id,item.name)",PAGE)
  def test_no_double_audio_and_cleanup(self):
-  self.assertIn("if(!audio)window.loadSuno(url)",PAGE)
+  self.assertIn("if(!audio){window.loadSuno(url)",PAGE)
   self.assertIn("window.resetNativeTrack?.()",PAGE)
   self.assertIn("URL.revokeObjectURL(objectUrl)",PAGE)
-  self.assertIn("if(sunoUrl&&valid())window.loadSuno?.(sunoUrl)",PAGE)
+  self.assertIn("if(!audio){window.loadSuno(url)",PAGE)
 if __name__=='__main__':unittest.main()

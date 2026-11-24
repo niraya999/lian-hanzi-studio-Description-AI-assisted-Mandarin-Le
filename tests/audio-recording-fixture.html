@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LHS Synthetic Audio Recording Test</title>
+<style>body{font:16px system-ui;background:#151821;color:#f4f1f7;padding:20px;max-width:680px;margin:auto}button{padding:10px;margin:4px;border-radius:8px}#status{padding:12px;background:#252a38;border-radius:8px;overflow-wrap:anywhere}audio{width:100%}</style>
+<h1>Synthetic MP3 capture fixture</h1>
+<p>Generated local audio only. This fixture does not request microphone permission or contact external services.</p>
+<audio id="track" controls></audio>
+<p><label><input id="autoNext" type="checkbox" checked> Auto Next test state</label></p>
+<button id="start">Start synthetic recording</button>
+<button id="pause">Pause source</button>
+<button id="resume">Resume source</button>
+<p id="status" role="status">Ready</p>
+<audio id="preview" controls hidden></audio>
+<script type="module">
+import { AudioRecordingEngine } from '../audio-recording-engine.mjs';
+const $ = id => document.getElementById(id);
+const audio = $('track');
+let outputUrl = '';
+audio.src = URL.createObjectURL(makeWav(2));
+const engine = new AudioRecordingEngine({
+  onState(s) { $('status').dataset.state = s.state; if (s.state === 'recording') $('status').textContent = `REC ${s.elapsed.toFixed(1)} / ${s.duration}`; else if (s.state === 'encoding') $('status').textContent = 'Encoding MP3...'; else if (s.state === 'ready') $('status').textContent = 'MP3 Ready'; else if (s.state === 'failed') $('status').textContent = 'Recording Failed — ' + s.message; },
+  async onReady(recording) {
+    window.__lastEncoded = recording.blob;
+    const bytes = new Uint8Array(await recording.blob.slice(0, 4).arrayBuffer());
+    if (!(bytes[0] === 0xff && (bytes[1] & 0xe0) === 0xe0)) throw new Error('Synthetic capture did not produce MP3 frames.');
+    if (outputUrl) URL.revokeObjectURL(outputUrl);
+    outputUrl = URL.createObjectURL(recording.blob);
+    $('preview').src = outputUrl;
+    $('preview').hidden = false;
+    $('status').dataset.bitrate = String(recording.bitrate);
+    $('status').dataset.duration = String(recording.duration);
+  }
+});
+$('start').onclick = async () => {
+  $('status').textContent = 'Starting';
+  try { await engine.start({ audio, trackId: 'synthetic-track', folderId: 'synthetic-folder', trackName: 'Synthetic', duration: 2, bitrate: 256, captureConsent: true, autoNextCheckbox: $('autoNext'), trackIsCurrent: () => true }); }
+  catch (error) { $('status').textContent = 'Recording Failed — ' + error.message; }
+};
+$('pause').onclick = () => audio.pause();
+$('resume').onclick = () => audio.play();
+function makeWav(seconds) {
+  const rate = 44100, channels = 2, frames = rate * seconds, bytes = new ArrayBuffer(44 + frames * channels * 2), view = new DataView(bytes);
+  const write = (offset, text) => [...text].forEach((c, i) => view.setUint8(offset + i, c.charCodeAt(0)));
+  write(0, 'RIFF'); view.setUint32(4, bytes.byteLength - 8, true); write(8, 'WAVE'); write(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, channels, true); view.setUint32(24, rate, true); view.setUint32(28, rate * channels * 2, true); view.setUint16(32, channels * 2, true); view.setUint16(34, 16, true); write(36, 'data'); view.setUint32(40, frames * channels * 2, true);
+  for (let i = 0; i < frames; i++) { const sample = Math.sin(2 * Math.PI * 440 * i / rate) * 0.25; view.setInt16(44 + i * 4, sample * 32767, true); view.setInt16(46 + i * 4, sample * 32767, true); }
+  return new Blob([bytes], { type: 'audio/wav' });
+}
+</script>
+</html>
