@@ -11,7 +11,8 @@ test('six-page delegated draft has stable ordered page and block IDs', () => {
   for (const [index, page] of pilot.pages.entries()) {
     assert.ok(page.id && !ids.has(page.id));
     ids.add(page.id);
-    assert.equal(page.next_page_id ?? null, pilot.pages[index + 1]?.id ?? null);
+    if (index < pilot.pages.length - 1) assert.equal(page.next_page_id, pilot.pages[index + 1].id);
+    else assert.ok(page.next_page_id, 'Final prologue page retains the future chapter reference');
     for (const block of page.blocks) {
       assert.ok(block.id && !ids.has(block.id));
       ids.add(block.id);
