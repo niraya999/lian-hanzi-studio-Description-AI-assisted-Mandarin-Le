@@ -43,7 +43,8 @@ try {
   await page.locator('#book[data-state="end"]').waitFor({ state: 'visible' });
   await page.screenshot({ path: `${output}/book-end.png`, fullPage: true });
   await page.locator('#readAgain').click();
-  await page.waitForFunction(() => document.querySelector('#pageLabel')?.textContent === 'PAGE 1');
+  await page.locator('#book[data-state="content"]').waitFor({ state: 'visible' });
+  await page.waitForFunction(() => document.querySelector('#pageCount')?.textContent === '1 / 3');
   await page.locator('#backLibrary').click();
   await page.locator('#library').waitFor({ state: 'visible' });
   await context.close();
