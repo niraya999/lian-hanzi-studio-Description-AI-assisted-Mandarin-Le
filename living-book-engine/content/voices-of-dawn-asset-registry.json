@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "assets": [
+    {
+      "asset_id": "vod-prologue-opening-v1",
+      "book_id": "voices-of-dawn",
+      "chapter_id": "prologue",
+      "page_id": "prologue-p01",
+      "role": "opening_illustration",
+      "approval_status": "approved",
+      "approval_scope": "visual_only",
+      "filename": "VoD_Prologue_Opening_v1_APPROVED.png",
+      "mime_type": "image/png",
+      "width": 1774,
+      "height": 887,
+      "aspect_ratio": "2:1",
+      "drive_file_id": "1fpXBG-LTsd0cKSQ8Y7g4W4zOBJ3PXiIl",
+      "drive_url": "https://drive.google.com/file/d/1fpXBG-LTsd0cKSQ8Y7g4W4zOBJ3PXiIl/view",
+      "notes": "Approved by owner in chat 2026-11-24. New opening visual; older Page 01 v2 is not overwritten or invalidated. No approval for other prologue illustrations."
+    }
+  ]
+}
