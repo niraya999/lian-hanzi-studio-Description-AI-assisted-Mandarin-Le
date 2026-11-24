@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "bookId": "demo-small-light-v1",
+  "kind": "sample-original",
+  "title": { "en": "A Small Light", "id": "Cahaya Kecil", "zh-Hant": "一盞小燈" },
+  "description": {
+    "en": "A lantern, a winding path, and the warmth of being found.",
+    "id": "Sebuah lentera, jalan berliku, dan hangatnya saat ditemukan.",
+    "zh-Hant": "一盞燈、一條蜿蜒的小路，還有被人找到時的溫暖。"
+  },
+  "chapters": [
+    {
+      "chapterId": "chapter-01",
+      "sequence": 1,
+      "title": { "en": "The Quiet Path", "id": "Jalan yang Sunyi", "zh-Hant": "寂靜小徑" },
+      "pages": [
+        {
+          "pageId": "page-01",
+          "sequence": 1,
+          "illustration": "dusk-path",
+          "text": {
+            "en": "At the edge of the village, Mina found a lantern beneath a cedar tree. Its little flame was still awake.",
+            "id": "Di tepi desa, Mina menemukan sebuah lentera di bawah pohon aras. Nyala kecilnya masih terjaga.",
+            "zh-Hant": "在村子的邊緣，米娜在一棵雪松下找到一盞燈。裡面的小火苗仍然醒著。"
+          },
+          "audio": { "narration": null, "momentMusic": null, "backgroundMusic": null }
+        },
+        {
+          "pageId": "page-02",
+          "sequence": 2,
+          "illustration": "river-bridge",
+          "text": {
+            "en": "She followed the narrow path past the river. With every step, the lantern painted a warmer circle on the stones.",
+            "id": "Ia mengikuti jalan kecil melewati sungai. Setiap langkah membuat lingkaran cahaya lentera terasa lebih hangat di atas batu.",
+            "zh-Hant": "她沿著小徑走過河邊。每走一步，燈光便在石頭上畫出一圈更溫暖的光。"
+          },
+          "audio": { "narration": null, "momentMusic": null, "backgroundMusic": null }
+        },
+        {
+          "pageId": "page-03",
+          "sequence": 3,
+          "illustration": "window-home",
+          "text": {
+            "en": "A window glowed in the distance. Mina lifted the lantern, and someone inside lifted a hand in reply.",
+            "id": "Sebuah jendela bersinar dari kejauhan. Mina mengangkat lenteranya, dan seseorang di dalam rumah membalas lambaian tangannya.",
+            "zh-Hant": "遠處有一扇窗亮著。米娜舉起燈，屋裡的人也揮手回應。"
+          },
+          "audio": { "narration": null, "momentMusic": null, "backgroundMusic": null }
+        }
+      ]
+    }
+  ],
+  "playlists": [],
+  "tracks": [],
+  "illustrationMotion": { "enabled": true, "reducedMotion": "static" }
+}

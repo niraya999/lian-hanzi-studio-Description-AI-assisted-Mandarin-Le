@@ -1,0 +1,47 @@
+name: Living Book Engine Preview
+on:
+  pull_request:
+    paths:
+      - 'living-book-engine/**'
+      - '.github/workflows/living-book-engine-preview.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-and-screenshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run engine tests
+        run: node --test living-book-engine/tests/engine.test.mjs
+      - name: Install browser smoke-test runner
+        run: |
+          npm install --no-save playwright
+          npx playwright install chromium
+      - name: Serve the standalone reader
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 --directory living-book-engine >/tmp/living-book-http.log 2>&1 &
+          python3 - <<'PY'
+          import time
+          import urllib.request
+          for attempt in range(40):
+              try:
+                  urllib.request.urlopen('http://127.0.0.1:4173/', timeout=1)
+                  break
+              except Exception:
+                  time.sleep(.25)
+          else:
+              raise SystemExit('Static preview did not start')
+          PY
+      - name: Exercise reader, bookmarks, resume, and layouts
+        run: node living-book-engine/tests/browser-smoke.mjs
+      - name: Upload review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: living-book-engine-screenshots-${{ github.sha }}
+          path: /tmp/living-book-engine-screenshots/*.png
+          if-no-files-found: warn
