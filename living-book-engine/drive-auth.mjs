@@ -1,6 +1,7 @@
 const CLIENT_ID = '405638478714-hikhdrp7r0ebg35an8asc41guqc014ep.apps.googleusercontent.com';
 const READ_ONLY = 'https://www.googleapis.com/auth/drive.readonly';
 const SESSION_KEY = 'lhs.drive.session.v1';
+const READER_SESSION_KEY = 'lian.book.drive.session.v1';
 
 /** Session-only credentials: the host LHS session can be reused in the same tab. */
 export function createDriveAuthorization({ gis = () => globalThis.google?.accounts?.oauth2, fetchImpl = fetch, sessionStorage = globalThis.sessionStorage } = {}) {
@@ -16,7 +17,7 @@ export function createDriveAuthorization({ gis = () => globalThis.google?.accoun
     if (current?.expires > Date.now() + 60000) return current;
     current = null;
     let saved;
-    try { saved = JSON.parse(sessionStorage?.getItem(SESSION_KEY) || 'null'); } catch { saved = null; }
+    try { saved = JSON.parse(sessionStorage?.getItem(READER_SESSION_KEY) || sessionStorage?.getItem(SESSION_KEY) || 'null'); } catch { saved = null; }
     if (saved?.token && saved.expires > Date.now() + 60000) {
       current = await identify(saved.token, saved.expires);
       return current;
@@ -31,12 +32,12 @@ export function createDriveAuthorization({ gis = () => globalThis.google?.accoun
       const finish = (error, value) => { if (done) return; done = true; clearTimeout(timer); error ? reject(error) : resolve(value); };
       const timer = setTimeout(() => finish(new Error('Google sign-in did not complete. Please retry.')), 60000);
       try {
-        const client = oauth.initTokenClient({ client_id: CLIENT_ID, scope: READ_ONLY, include_granted_scopes: false, login_hint: 'martin@installindonesia.org', callback: async response => {
+        const client = oauth.initTokenClient({ client_id: CLIENT_ID, scope: READ_ONLY, include_granted_scopes: false, callback: async response => {
           if (response.error || !response.access_token) return finish(new Error('Google Drive sign-in was cancelled or denied.'));
           try {
             const expires = Date.now() + Number(response.expires_in || 3600) * 1000;
             current = await identify(response.access_token, expires);
-            if (current.email && current.email.toLowerCase() !== 'martin@installindonesia.org') { current = null; return finish(new Error('Please choose martin@installindonesia.org.')); }
+            try { sessionStorage?.setItem(READER_SESSION_KEY, JSON.stringify({token:response.access_token,expires})); } catch {}
             finish(null, current);
           } catch (e) { finish(e); }
         }, error_callback: () => finish(new Error('Google sign-in did not complete. Please retry.')) });
@@ -44,5 +45,5 @@ export function createDriveAuthorization({ gis = () => globalThis.google?.accoun
       } catch (e) { finish(e); }
     });
   }
-  return { connect, getAccessToken, clear() { current = null; } };
+  return { connect, getAccessToken, clear() { current = null; try { sessionStorage?.removeItem(READER_SESSION_KEY); } catch {} } };
 }
