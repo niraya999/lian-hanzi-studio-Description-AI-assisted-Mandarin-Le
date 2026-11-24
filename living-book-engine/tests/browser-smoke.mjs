@@ -21,6 +21,7 @@ try {
   await page.waitForFunction(() => document.querySelector('#pageLabel')?.textContent === 'PAGE 2');
   await page.locator('#bookmarkButton').click();
   await page.waitForFunction(() => document.querySelector('#bookmarkCount')?.textContent === '1');
+  await page.waitForTimeout(700);
   await page.screenshot({ path: `${output}/book-portrait.png`, fullPage: true });
 
   await page.locator('#backLibrary').click();
@@ -35,12 +36,14 @@ try {
   await page.waitForFunction(() => document.querySelector('#pageLabel')?.textContent === 'PAGE 2');
   await page.locator('#layoutToggle').click();
   await page.waitForFunction(() => document.querySelectorAll('.paper-page').length === 2);
+  await page.waitForTimeout(700);
   await page.screenshot({ path: `${output}/book-spread.png`, fullPage: true });
   await page.locator('#layoutToggle').click();
   await page.locator('#nextPage').click();
   await page.waitForFunction(() => document.querySelector('#pageLabel')?.textContent === 'PAGE 3');
   await page.locator('#nextPage').click();
   await page.locator('#book[data-state="end"]').waitFor({ state: 'visible' });
+  await page.locator('#endScreen').waitFor({ state: 'visible' });
   await page.screenshot({ path: `${output}/book-end.png`, fullPage: true });
   await page.locator('#readAgain').click();
   await page.locator('#book[data-state="content"]').waitFor({ state: 'visible' });
