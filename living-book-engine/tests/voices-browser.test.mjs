@@ -12,7 +12,7 @@ try {
  await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden]) .voices-cover-image').waitFor(); assert.equal(media,5);
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-inner').waitFor();
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-title-page').waitFor(); assert.equal(await page.locator('.voices-title-page h1').innerText(),'破曉之聲');
- await page.locator('#voicesReader [data-act=bookmark]').click(); assert.equal(await page.locator('[data-bookmark-count]').innerText(),'1');
+ await page.locator('#voicesReader [data-act=bookmark]').click(); await page.waitForFunction(() => document.querySelector('[data-bookmark-count]')?.textContent === '1');
  await page.locator('#voicesReader [data-act=library]').click(); await page.locator('#bookCard').click(); await page.locator('#nextPage').click(); await page.locator('#book[data-state=content]').waitFor(); assert.equal(await page.locator('#bookmarkCount').innerText(),'0');
  await page.locator('#backLibrary').click(); await page.locator('#voicesCard').click(); await page.locator('#voicesReader .voices-cover-image').waitFor(); await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-title-page').waitFor();
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('#voicesReader [data-act=next]').click(); assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Back cover');
