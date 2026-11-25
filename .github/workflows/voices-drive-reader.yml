@@ -20,6 +20,8 @@ jobs:
           npm install --no-save playwright
           npx playwright install --with-deps chromium
       - name: Test browser with mocked Drive responses
+        env:
+          LIVING_BOOK_URL: http://127.0.0.1:4318/
         run: |
           python3 -m http.server 4318 --bind 127.0.0.1 --directory living-book-engine >/tmp/voices-http.log 2>&1 &
           node living-book-engine/tests/voices-browser.test.mjs
