@@ -48,7 +48,11 @@ try {
  await page.screenshot({path:`${output}/audiobook-mobile.png`,fullPage:true});
  await page.locator('[data-audio-action="play"]').click();
  await page.waitForFunction(()=>document.querySelector('[data-audio-action="play"]')?.textContent==='Pause');
+ await page.locator('[data-mode="read-listen"]').click();
+ await page.locator('.voices-chapter-page').waitFor();
  await page.locator('[data-audio-seek]').fill('260');
+ while(await page.locator('#voicesReader [data-act=next]').isDisabled() && !await page.locator('#voicesReader [data-act=previous]').isDisabled()) await page.locator('#voicesReader [data-act=previous]').click();
+ assert.equal(await page.locator('#voicesReader [data-act=next]').isDisabled(),false,'the test chapter should have a manual next page');
  const beforeTurn=await page.locator('[data-audio-element]').evaluate(a=>a.currentTime);
  await page.locator('#voicesReader [data-act=next]').click();
  const afterTurn=await page.locator('[data-audio-element]').evaluate(a=>a.currentTime);
@@ -62,7 +66,6 @@ try {
  assert.equal(await page.locator('[data-audio-element]').evaluate(a=>a.volume),0.35);
  await page.setViewportSize({width:1440,height:960});
  await page.screenshot({path:`${output}/audiobook-desktop.png`,fullPage:true});
- await page.locator('[data-mode="read-listen"]').click();
  await page.locator('.voices-chapter-page').waitFor(); await page.locator('.voices-audio-player').waitFor({state:'visible'});
  await page.locator('[data-mode="reading"]').click();
  assert.equal(await page.locator('.voices-audio-player').isVisible(),false);
