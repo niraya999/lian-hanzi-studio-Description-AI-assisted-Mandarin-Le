@@ -15,12 +15,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run engine tests
-        run: node --test living-book-engine/tests/engine.test.mjs
       - name: Install browser smoke-test runner
         run: |
           npm install --no-save playwright
           npx playwright install chromium
+      - name: Run unit and integration tests
+        run: node --test living-book-engine/tests/engine.test.mjs living-book-engine/tests/drive-assets.test.mjs living-book-engine/tests/voices-prologue.test.mjs living-book-engine/tests/audiobook.test.mjs
       - name: Serve the standalone reader
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 --directory living-book-engine >/tmp/living-book-http.log 2>&1 &
@@ -38,6 +38,10 @@ jobs:
           PY
       - name: Exercise reader, bookmarks, resume, and layouts
         run: node living-book-engine/tests/browser-smoke.mjs
+      - name: Exercise authenticated Voice of Dawn reader and audiobook
+        env:
+          LIVING_BOOK_URL: http://127.0.0.1:4173/
+        run: node living-book-engine/tests/voices-browser.test.mjs
       - name: Upload review screenshots
         if: always()
         uses: actions/upload-artifact@v4

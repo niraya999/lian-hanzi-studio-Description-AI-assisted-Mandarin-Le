@@ -65,7 +65,7 @@ jobs:
               subprocess.run(['node','--check',path],check=True)
           subprocess.run(['node','--check','audio-recording-engine.mjs'],check=True)
           assert 'id="enableAudioRecording"' in html
-          assert 'lhs-shell-v125' in sw
+          assert 'lhs-shell-v126' in sw
           print('BCS integration and JavaScript syntax checks passed')
           PY
       - name: Run recording engine tests
