@@ -71,6 +71,8 @@ try {
  assert.equal(await page.locator('.voices-audio-player').isVisible(),false);
  assert.equal(await page.locator('[data-audio-element]').evaluate(a=>a.paused),true);
 
+ await page.locator('[data-section]').selectOption('prologue');
+ await page.locator('.voices-prologue-page').waitFor();
  for (let i=0;i<7;i++) await page.locator('#voicesReader [data-act=next]').click();
  assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Back cover');
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('#library:not([hidden])').waitFor();
