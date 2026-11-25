@@ -45,7 +45,7 @@ const playback = createAudioPlaybackController({ audio: audioElement, onStateCha
 const sectionSelect = view.querySelector('[data-section]');
 const chapterRecord = () => state.manifest?.chapters?.find(item => item.id === 'chapter-01');
 async function ensureChapterAudio(retry = false) {
-  const audioMeta = chapterRecord()?.audio?.find(item => item.status === 'DRAFT / PILOT' || item.status === 'DRAFT/PILOT');
+  const audioMeta = chapterRecord()?.audio?.find(item => [item.approval_status, item.status].some(status => status === 'DRAFT / PILOT' || status === 'DRAFT/PILOT'));
   if (!audioMeta) throw new Error('No pilot audio is configured for this chapter.');
   if (state.audioUrl && !retry) return state.audioUrl;
   state.audioError = '';
