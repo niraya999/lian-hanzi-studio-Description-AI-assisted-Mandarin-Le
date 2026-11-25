@@ -32,7 +32,7 @@ jobs:
           test -s dist/lcf/articles.json
           grep -q 'id="openLcfModule"' dist/index.html
           grep -q 'id="enableAudioRecording"' dist/index.html
-          grep -q 'lhs-shell-v125' dist/sw.js
+          grep -q 'lhs-shell-v126' dist/sw.js
           test -s dist/audio-recording-engine.mjs
           test -s dist/vendor/audio/lamejs.iife.js
       - uses: actions/upload-artifact@v4

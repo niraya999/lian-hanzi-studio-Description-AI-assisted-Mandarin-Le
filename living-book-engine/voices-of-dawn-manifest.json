@@ -17,7 +17,37 @@
     "innerCover": "1-Uk34jBkqeF_rJ0rd9YyATvDmWGT-_0k",
     "paperTexture": "1xa-oVjLLKSC7BrU_YR5MmY8pl5eUpItH"
   },
-  "chapters": [],
+  "chapters": [
+    {
+      "id": "chapter-01",
+      "chapter_id": "chapter-01",
+      "title": {
+        "zh-Hant": "青林村的晨光",
+        "id-ID": "青林村的晨光 — Cahaya Pagi di Desa Qinglin",
+        "en": "Qinglin Village at First Light"
+      },
+      "source": {
+        "provider": "google-docs",
+        "document_id": "1Dp-6TroQAHZqUUpovdlEeVKBir7LhqWXLgQcNTn5nUg",
+        "document_version": "EDITORIAL DRAFT v0.9"
+      },
+      "audio": [
+        {
+          "audio_asset_id": "vod-ch01-narrator-lz-id-pilot-v01",
+          "chapter_id": "chapter-01",
+          "scene_id": null,
+          "narrator_id": "lian-zhou",
+          "narrator_name": "Lian Zhou (蓮舟)",
+          "language": "id-ID",
+          "drive_file_id": "1HkgdFww3WUCB3jXh8S2sc1SG6QvdGp1b",
+          "mime_type": "audio/mpeg",
+          "duration_seconds": 77.184,
+          "audio_version": "v0.1",
+          "approval_status": "DRAFT / PILOT"
+        }
+      ]
+    }
+  ],
   "playlists": [],
   "tracks": []
 }

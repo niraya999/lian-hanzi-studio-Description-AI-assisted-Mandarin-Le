@@ -4,7 +4,7 @@ import { mkdir } from 'node:fs/promises';
 const origin = process.env.LIVING_BOOK_URL || 'http://127.0.0.1:4173';
 const output = process.env.LIVING_BOOK_SCREENSHOTS || '/tmp/living-book-engine-screenshots';
 await mkdir(output, { recursive: true });
-const browser = await chromium.launch({ headless: true });
+const browser = await chromium.launch({ headless: true, ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}) });
 try {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
   const page = await context.newPage();
