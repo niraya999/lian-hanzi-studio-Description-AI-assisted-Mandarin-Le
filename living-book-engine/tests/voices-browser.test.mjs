@@ -38,6 +38,7 @@ try {
  await page.locator('[data-mode="audiobook"]').click();
  await page.locator('.voices-audiobook-scene img').waitFor();
  await page.locator('.voices-audio-player').waitFor({state:'visible'});
+ await page.waitForFunction(()=>document.querySelector('[data-scene-narrator]')?.textContent.includes('Lian Zhou'));
  await page.locator('[data-audio-element]').evaluate(audio=>audio.dispatchEvent(new Event('loadedmetadata')));
  await page.waitForFunction(()=>document.querySelector('[data-audio-duration]')?.textContent==='1:17');
  assert.match(await page.locator('[data-scene-narrator]').innerText(),/Lian Zhou/);
