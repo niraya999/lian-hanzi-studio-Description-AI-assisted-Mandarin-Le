@@ -138,9 +138,9 @@ function createChapterPage(page) {
   return panel;
 }
 const words = {
-  en: { connect:'Connect Google Drive through LHS', ready:'Open book', required:'Connect Google Drive through LHS to view the original artwork.', title:'Title page', inner:'Inner cover', front:'Front cover', back:'Back cover', previous:'← Previous', next:'Next →', library:'Back to library', reconnect:'LHS Drive access expired. Reconnect through LHS.', denied:'This Google account cannot access the Drive file (403). Reconnect and select an account with access.', pending:'Loading original artwork…', bookmark:'Title page', saved:'Bookmark saved', empty:'No bookmarks saved.' },
-  id: { connect:'Hubungkan Google Drive', ready:'Buka buku', required:'Hubungkan Google Drive untuk melihat gambar asli.', title:'Halaman judul', inner:'Sampul dalam', front:'Sampul depan', back:'Sampul belakang', previous:'← Sebelumnya', next:'Lanjut →', library:'Kembali ke perpustakaan', reconnect:'Akses Drive LHS kedaluwarsa (401). Hubungkan kembali melalui LHS.', denied:'Akun Google ini tidak memiliki akses ke file Drive (403). Hubungkan kembali dan pilih akun yang memiliki akses.', pending:'Memuat gambar asli…', bookmark:'Halaman judul', saved:'Penanda tersimpan', empty:'Belum ada penanda.' },
-  'zh-Hant': { connect:'連接 Google 雲端硬碟', ready:'打開書本', required:'連接 Google 雲端硬碟以查看原始圖片。', title:'書名頁', inner:'內封', front:'封面', back:'封底', previous:'← 上一頁', next:'下一頁 →', library:'返回書架', reconnect:'LHS 雲端硬碟授權已過期（401），請透過 LHS 重新連接。', denied:'此 Google 帳戶無法存取雲端硬碟檔案（403）。請重新連接並選擇有權限的帳戶。', pending:'正在載入原始圖片…', bookmark:'書名頁', saved:'書籤已儲存', empty:'尚未儲存書籤。' }
+  en: { connect:'Connect Google Drive through LHS', changeAccount:'Reconnect & choose Google account', reconnecting:'Opening Google account chooser through LHS…', ready:'Open book', required:'Connect Google Drive through LHS to view the original artwork.', title:'Title page', inner:'Inner cover', front:'Front cover', back:'Back cover', previous:'← Previous', next:'Next →', library:'Back to library', reconnect:'LHS Drive access expired. Reconnect through LHS.', denied:'Google Drive denied access to this file (403).', pending:'Loading original artwork…', bookmark:'Title page', saved:'Bookmark saved', empty:'No bookmarks saved.' },
+  id: { connect:'Hubungkan Google Drive', changeAccount:'Hubungkan ulang & pilih akun Google', reconnecting:'Membuka pemilih akun Google melalui LHS…', ready:'Buka buku', required:'Hubungkan Google Drive untuk melihat gambar asli.', title:'Halaman judul', inner:'Sampul dalam', front:'Sampul depan', back:'Sampul belakang', previous:'← Sebelumnya', next:'Lanjut →', library:'Kembali ke perpustakaan', reconnect:'Akses Drive LHS kedaluwarsa (401). Hubungkan kembali melalui LHS.', denied:'Google Drive menolak akses ke file ini (403).', pending:'Memuat gambar asli…', bookmark:'Halaman judul', saved:'Penanda tersimpan', empty:'Belum ada penanda.' },
+  'zh-Hant': { connect:'連接 Google 雲端硬碟', changeAccount:'重新連接並選擇 Google 帳戶', reconnecting:'正在透過 LHS 開啟 Google 帳戶選擇器…', ready:'打開書本', required:'連接 Google 雲端硬碟以查看原始圖片。', title:'書名頁', inner:'內封', front:'封面', back:'封底', previous:'← 上一頁', next:'下一頁 →', library:'返回書架', reconnect:'LHS 雲端硬碟授權已過期（401），請透過 LHS 重新連接。', denied:'Google 雲端硬碟拒絕存取此檔案（403）。', pending:'正在載入原始圖片…', bookmark:'書名頁', saved:'書籤已儲存', empty:'尚未儲存書籤。' }
 };
 function t(key) { return (words[$('#languageSelect').value] || words.en)[key]; }
 function safeAsset(id) { return state.manifest?.assets?.[id]; }
@@ -235,13 +235,19 @@ async function restoreBookState() {
   render();
 }
 function showBookLoadError(error) {
-  msg.replaceChildren(document.createTextNode(error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — `));
+  const message = error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — `;
+  msg.replaceChildren(document.createTextNode(message));
+  if (error.status === 403) {
+    const details = [error.accountEmail ? `Connected account: ${error.accountEmail}.` : '', error.driveReason ? `Drive reason: ${error.driveReason}.` : ''].filter(Boolean).join(' ');
+    if (details) msg.append(document.createElement('br'), document.createTextNode(details));
+  }
   const retry=document.createElement('button');
   retry.type='button';
-  retry.className='secondary-button';
-  retry.textContent=error.code === 'AUTH_REQUIRED' ? t('connect') : 'Retry loading artwork';
+  retry.className=error.status === 403 ? 'primary-button voices-reconnect-account' : 'secondary-button';
+  retry.textContent=error.status === 403 ? t('changeAccount') : error.code === 'AUTH_REQUIRED' ? t('connect') : 'Retry loading artwork';
   retry.addEventListener('click',async()=>{
     retry.disabled=true;
+    if (error.status === 403) msg.firstChild.textContent = t('reconnecting');
     try {
       if(error.code === 'AUTH_REQUIRED') await auth.connect({force:true});
       await loadAll();
