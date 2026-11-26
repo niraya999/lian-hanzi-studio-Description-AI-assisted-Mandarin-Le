@@ -38,7 +38,7 @@ try {
  assert.match(await page.locator('.voices-page-status').innerText(),/EDITORIAL DRAFT v1.0/);
  assert.equal(await page.locator('.voices-prologue-paragraph').first().innerText(),'Pada malam itu, anjing-anjing berhenti menggonggong.');
  assert.equal(await page.locator('.voices-page-illustration').count(),1);
- for(let i=1;i<=6;i++) { assert.match(await page.locator('#voicesReader [data-page-label]').innerText(),new RegExp(`Draft ${i} / 6`)); assert.equal(await page.locator('.voices-page-illustration').count(),1); if(i<6) await page.locator('#voicesReader [data-act=next]').click(); }
+ for(let i=1;i<=6;i++) { assert.match(await page.locator('#voicesReader [data-page-label]').innerText(),new RegExp(`Draft ${i} / 6`)); assert.equal(await page.locator('.voices-page-illustration').count(),1); if(i<6) { await page.locator('#voicesReader [data-act=next]').click(); await page.waitForFunction(expected=>document.querySelector('#voicesReader [data-page-label]')?.textContent===expected,`Prologue · Draft ${i+1} / 6`); } }
  for(let i=0;i<5;i++) await page.locator('#voicesReader [data-act=previous]').click();
 
  await page.locator('[data-section]').selectOption('chapter-01');
