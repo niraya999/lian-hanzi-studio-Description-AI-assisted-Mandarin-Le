@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdir, readFile } from 'node:fs/promises';
 
 const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH}:{})});
-const errors=[]; let media=0; let audioMedia=0; let unauthorized=false;
+const errors=[]; let media=0; let audioMedia=0; let unauthorized=false; let artworkFailure=false;
 const output=process.env.LIVING_BOOK_SCREENSHOTS||'/tmp/living-book-engine-screenshots';
 await mkdir(output,{recursive:true});
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZ0AAAAASUVORK5CYII=','base64');
@@ -22,7 +22,7 @@ try {
   }
   return r.fulfill({json:{title:'Test Chapter',body:{content:[{paragraph:{elements:[{textRun:{content:'Pagi turun di 青林村.\n'}}]}},{paragraph:{elements:[{textRun:{content:'(Lian Xin)\n'}}]}},{paragraph:{elements:[{textRun:{content:'A'.repeat(1401)+'\n'}}]}},{paragraph:{elements:[{inlineObjectElement:{inlineObjectId:'art-1'}}]}}]},inlineObjects:{'art-1':{inlineObjectProperties:{embeddedObject:{title:'Dawn illustration',imageProperties:{contentUri:`data:image/png;base64,${png.toString('base64')}`}}}}}}});
  });
- await page.route('https://www.googleapis.com/**',async r=>{const url=r.request().url(); if(unauthorized) return r.fulfill({status:401}); if(url.includes('/about?'))return r.fulfill({json:{user:{permissionId:'mock-account',emailAddress:'martin@installindonesia.org'}}}); const audio=url.includes('1HkgdFww3WUCB3jXh8S2sc1SG6QvdGp1b'); if(url.includes('alt=media')){if(audio){audioMedia++;return r.fulfill({contentType:'audio/mpeg',body:Buffer.from('private-pilot-audio')})}media++;return r.fulfill({contentType:'image/png',body:png});}return r.fulfill({json:{mimeType:audio?'audio/mpeg':'image/png',md5Checksum:'v1'}});});
+ await page.route('https://www.googleapis.com/**',async r=>{const url=r.request().url(); if(unauthorized) return r.fulfill({status:401}); if(url.includes('/about?'))return r.fulfill({json:{user:{permissionId:'mock-account',emailAddress:'martin@installindonesia.org'}}}); const audio=url.includes('1HkgdFww3WUCB3jXh8S2sc1SG6QvdGp1b'); if(url.includes('alt=media')){if(audio){audioMedia++;return r.fulfill({contentType:'audio/mpeg',body:Buffer.from('private-pilot-audio')})}if(artworkFailure)return r.fulfill({status:503,body:'temporary artwork failure'});media++;return r.fulfill({contentType:'image/png',body:png});}return r.fulfill({json:{mimeType:audio?'audio/mpeg':'image/png',md5Checksum:'v1'}});});
  await page.goto(process.env.LIVING_BOOK_URL||'http://127.0.0.1:4173/'); await page.locator('#voicesConnect').waitFor();
  await page.locator('#voicesConnect').click(); await page.locator('.voices-card-cover').waitFor(); assert.equal(await page.evaluate(()=>window.__lhsAuthRequests),1,'LBE must send one auth request through the LHS broker');
  await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden]) .voices-cover-image').waitFor(); assert.equal(media,5);
@@ -95,6 +95,13 @@ try {
  await page.locator('[data-section]').selectOption('chapter-01'); await page.locator('.voices-chapter-page').waitFor();
  assert.equal(await page.locator('.voices-reader-modes').isVisible(),false,'chapter without audio must remain readable without live-looking audio controls');
  assert.equal(await page.locator('.voices-audio-player').isVisible(),false);
+ await page.locator('#voicesReader [data-act=library]').click();
+ await page.evaluate(()=>new Promise(resolve=>{const req=indexedDB.open('lian-living-book-asset-cache',1);req.onsuccess=()=>{const db=req.result;const tx=db.transaction('assets','readwrite');tx.objectStore('assets').clear();tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();resolve()}};req.onerror=resolve}));
+ artworkFailure=true; await page.reload(); await page.locator('#voicesCard').waitFor(); await page.locator('#voicesCard').click();
+ await page.locator('#voicesReader:not([hidden])').waitFor(); assert.equal(await page.locator('#library').isVisible(),false,'artwork failure must keep the user in the book reader');
+ assert.match(await page.locator('.voices-message').innerText(),/503/); await page.locator('.voices-message button').waitFor();
+ artworkFailure=false; await page.locator('.voices-message button').click(); await page.locator('.voices-title-page').waitFor();
+ assert.equal(await page.locator('#voicesReader:not([hidden])').isVisible(),true,'retry should finish opening the book without returning to the shelf');
  assert.deepEqual(errors,[]);
  console.log(`Mocked Drive browser flow passed: LHS-only authentication, prologue, illustrations, annotations, Chapter 01, reader modes, player controls, manual-turn continuity, no-audio fallback. Screenshots: ${output}/audiobook-mobile.png, ${output}/audiobook-desktop.png; images ${media}, audio ${audioMedia}.`);
  await ctx.close();
