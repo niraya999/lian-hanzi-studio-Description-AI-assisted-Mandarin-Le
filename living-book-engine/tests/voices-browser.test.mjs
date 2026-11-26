@@ -108,7 +108,7 @@ try {
  driveDeniedStatus=403; await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden])').waitFor();
  await page.waitForFunction(()=>document.querySelector('.voices-message')?.textContent.includes('(403)'));
  assert.match(await page.locator('.voices-message').innerText(),/cannot access the Drive file \(403\)/);
- driveDeniedStatus=0; await page.locator('.voices-message button').click(); await page.locator('.voices-title-page').waitFor();
+ driveDeniedStatus=0; await page.locator('.voices-message button').click(); await page.locator('.voices-chapter-page').waitFor();
  assert.equal(await page.evaluate(()=>window.__lhsAuthRequests),2,'a denied Drive file should request one LHS reconnect');
  assert.equal(await page.evaluate(()=>window.__lhsAuthOptions.at(-1)?.force),true,'a denied Drive file should request account selection during forced reconnect');
  assert.deepEqual(errors,[]);
