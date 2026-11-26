@@ -19,7 +19,7 @@ export function createDriveAuthorization({ brokerProvider = () => {
   }
   async function identify(token, expires) {
     const response = await fetchImpl('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress%2CpermissionId)', { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
-    if (!response.ok) { const e = new Error('Unable to identify the connected Drive account. Please reconnect.'); e.code = 'AUTH_REQUIRED'; throw e; }
+    if (!response.ok) { const e = new Error('Unable to identify the connected Drive account. Please reconnect.'); e.code = 'AUTH_REQUIRED'; e.status = response.status; throw e; }
     const { user } = await response.json();
     if (!user?.permissionId) throw new Error('Google Drive did not provide an account identifier.');
     return { token, expires, accountId: user.permissionId, email: user.emailAddress || '' };

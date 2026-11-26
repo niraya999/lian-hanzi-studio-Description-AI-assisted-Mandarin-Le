@@ -4,8 +4,9 @@ export function createDriveAudioLoader({ getAccessToken, cache, fetchImpl = fetc
   async function request(url, token) {
     const response = await fetchImpl(url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
     if (response.status === 401 || response.status === 403) {
-      const error = new Error('Google Drive authorization expired or access was denied. Reconnect and retry.');
+      const error = new Error(response.status === 401 ? 'Google Drive access token expired or was rejected (401).' : 'The connected Google account cannot access this Drive file (403).');
       error.code = 'AUTH_REQUIRED';
+      error.status = response.status;
       throw error;
     }
     if (!response.ok) throw new Error(`Drive request failed (${response.status}).`);

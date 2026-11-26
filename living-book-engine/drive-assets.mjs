@@ -3,7 +3,7 @@ export function createDriveAssetLoader({ getAccessToken, cache, fetchImpl = fetc
   const urls = new Set();
   async function request(url, token) {
     const result = await fetchImpl(url, { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' });
-    if (result.status === 401 || result.status === 403) { const error = new Error('Google Drive authorization expired or access was denied. Reconnect and try again.'); error.code = 'AUTH_REQUIRED'; throw error; }
+    if (result.status === 401 || result.status === 403) { const error = new Error(result.status === 401 ? 'Google Drive access token expired or was rejected (401).' : 'The connected Google account cannot access this Drive file (403).'); error.code = 'AUTH_REQUIRED'; error.status = result.status; throw error; }
     if (!result.ok) throw new Error(`Drive request failed (${result.status}).`);
     return result;
   }

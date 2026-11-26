@@ -5,7 +5,7 @@ export async function loadGoogleDocument({ documentId, getAccessToken, fetchImpl
   if (!session?.token) { const error = new Error('Connect Google Drive to open this chapter.'); error.code = 'AUTH_REQUIRED'; throw error; }
   const url = `https://docs.googleapis.com/v1/documents/${encodeURIComponent(documentId)}?includeTabsContent=true`;
   const response = await fetchImpl(url, { headers: { Authorization: `Bearer ${session.token}` }, cache: 'no-store' });
-  if (response.status === 401 || response.status === 403) { const error = new Error('Google Drive authorization expired or access was denied. Reconnect and retry.'); error.code = 'AUTH_REQUIRED'; throw error; }
+  if (response.status === 401 || response.status === 403) { const error = new Error(response.status === 401 ? 'Google Drive access token expired or was rejected (401).' : 'The connected Google account cannot access this Drive file (403).'); error.code = 'AUTH_REQUIRED'; error.status = response.status; throw error; }
   if (!response.ok) throw new Error(`Chapter document request failed (${response.status}).`);
   return response.json();
 }
