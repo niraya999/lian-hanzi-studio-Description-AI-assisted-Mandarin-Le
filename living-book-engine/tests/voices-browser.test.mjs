@@ -107,7 +107,7 @@ try {
  await page.locator('#voicesReader [data-act=library]').click();
  await page.evaluate(()=>new Promise(resolve=>{const req=indexedDB.open('lian-living-book-asset-cache',1);req.onsuccess=()=>{const db=req.result;const tx=db.transaction('assets','readwrite');tx.objectStore('assets').clear();tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();resolve()}};req.onerror=resolve}));
  driveDeniedStatus=403; await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden])').waitFor();
- await page.waitForFunction(()=>document.querySelector('.voices-message')?.textContent.includes('(403)'));
+ await page.waitForFunction(()=>document.querySelector('.voices-message')?.textContent.includes('(403)'),{timeout:5000}).catch(async error=>{console.log('403 diagnostic',JSON.stringify({message:await page.locator('.voices-message').innerText(),readerVisible:await page.locator('#voicesReader').isVisible(),pageLabel:await page.locator('#voicesReader [data-page-label]').innerText(),errors}));throw error});
  assert.ok((await page.locator('.voices-message').innerText()).includes('403'));
  driveDeniedStatus=0; await page.locator('.voices-message button').click(); await page.locator('.voices-chapter-page').waitFor();
  assert.equal(await page.evaluate(()=>window.__lhsAuthRequests),2,'a denied Drive file should request one LHS reconnect');
