@@ -90,7 +90,7 @@ try {
  await page.locator('#voicesReader [data-act=library]').click(); await page.locator('#library:not([hidden])').waitFor();
  const manifest=JSON.parse(await readFile(new URL('../voices-of-dawn-manifest.json',import.meta.url),'utf8')); manifest.chapters[0].audio=[];
  await page.route('**/voices-of-dawn-manifest.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify(manifest)}));
- await page.reload(); await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden])').waitFor();
+ await page.reload(); await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden])').waitFor(); await page.locator('.voices-prologue-page').waitFor();
  await page.locator('[data-section]').selectOption('chapter-01'); await page.locator('.voices-chapter-page').waitFor();
  assert.equal(await page.locator('.voices-reader-modes').isVisible(),false,'chapter without audio must remain readable without live-looking audio controls');
  assert.equal(await page.locator('.voices-audio-player').isVisible(),false);
