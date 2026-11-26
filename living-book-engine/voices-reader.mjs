@@ -243,7 +243,7 @@ function showBookLoadError(error) {
   retry.addEventListener('click',async()=>{
     retry.disabled=true;
     try {
-      if(error.code === 'AUTH_REQUIRED') await auth.connect();
+      if(error.code === 'AUTH_REQUIRED') await auth.connect({force:true});
       await loadAll();
       await restoreBookState();
     } catch(nextError) { showBookLoadError(nextError); }
