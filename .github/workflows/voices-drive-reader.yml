@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: 22
       - name: Test reader and Drive cache
-        run: node --test living-book-engine/tests/engine.test.mjs living-book-engine/tests/drive-assets.test.mjs living-book-engine/tests/voices-prologue.test.mjs
+        run: node --test living-book-engine/tests/engine.test.mjs living-book-engine/tests/drive-auth.test.mjs living-book-engine/tests/drive-assets.test.mjs living-book-engine/tests/voices-prologue.test.mjs
       - name: Install Playwright
         run: |
           npm install --no-save playwright

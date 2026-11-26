@@ -36,9 +36,18 @@ class AudioRecordingIntegration(unittest.TestCase):
         self.assertIn('new lamejs.Mp3Encoder(channelCount, 44100, bitrate)', WORKER)
         for path in ('./audio-recording-ui.js?v=1', './audio-recording-engine.mjs', './audio-capture.worklet.js', './mp3-encoder.worker.js', './vendor/audio/lamejs.iife.js'):
             self.assertIn(path, SW)
-        self.assertIn("lhs-shell-v127", SW)
-        self.assertIn('v0.8.6-beta', HTML)
-        self.assertIn('id="openLivingBookEngine" href="./living-book-engine/"', HTML)
+        self.assertIn("lhs-shell-v128", SW)
+        self.assertIn('v0.8.7-beta', HTML)
+        self.assertIn('id="openLivingBookEngine"', HTML)
+        self.assertIn('id="livingBookFrame"', HTML)
+        self.assertIn('window.lhsDriveBroker=', HTML)
+        self.assertIn('id="livingBook"', HTML)
+        self.assertIn("window.showTab('living-book')", HTML)
+        LBE = (ROOT / 'living-book-engine' / 'drive-auth.mjs').read_text(encoding='utf-8')
+        LBE_HTML = (ROOT / 'living-book-engine' / 'index.html').read_text(encoding='utf-8')
+        self.assertIn('broker.requestAccessToken()', LBE)
+        self.assertNotIn('accounts.google.com/gsi/client', LBE_HTML)
+        self.assertIn("function bootReconnect(){if(!el('rememberDrive').checked||getPref(linked)!=='1')return;status('Katalog tersimpan tersedia. Ketuk Connect untuk menghubungkan Drive.')}", HTML)
 
     def test_sync_is_manual_and_never_overwrites_a_drive_mp3(self):
         self.assertIn('Sync All Ready MP3', HTML)
