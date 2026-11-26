@@ -99,6 +99,7 @@ try {
  await page.evaluate(()=>new Promise(resolve=>{const req=indexedDB.open('lian-living-book-asset-cache',1);req.onsuccess=()=>{const db=req.result;const tx=db.transaction('assets','readwrite');tx.objectStore('assets').clear();tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>{db.close();resolve()}};req.onerror=resolve}));
  artworkFailure=true; await page.reload(); await page.locator('#voicesCard').waitFor(); await page.locator('#voicesCard').click();
  await page.locator('#voicesReader:not([hidden])').waitFor(); assert.equal(await page.locator('#library').isVisible(),false,'artwork failure must keep the user in the book reader');
+ await page.waitForFunction(()=>document.querySelector('.voices-message')?.textContent.includes('503'));
  assert.match(await page.locator('.voices-message').innerText(),/503/); await page.locator('.voices-message button').waitFor();
  artworkFailure=false; await page.locator('.voices-message button').click(); await page.locator('.voices-chapter-page').waitFor();
  assert.equal(await page.locator('#voicesReader:not([hidden])').isVisible(),true,'retry should finish opening the book without returning to the shelf');
