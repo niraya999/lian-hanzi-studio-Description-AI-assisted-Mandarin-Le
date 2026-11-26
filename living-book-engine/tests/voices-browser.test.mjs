@@ -100,7 +100,7 @@ try {
  artworkFailure=true; await page.reload(); await page.locator('#voicesCard').waitFor(); await page.locator('#voicesCard').click();
  await page.locator('#voicesReader:not([hidden])').waitFor(); assert.equal(await page.locator('#library').isVisible(),false,'artwork failure must keep the user in the book reader');
  assert.match(await page.locator('.voices-message').innerText(),/503/); await page.locator('.voices-message button').waitFor();
- artworkFailure=false; await page.locator('.voices-message button').click(); await page.locator('.voices-title-page').waitFor();
+ artworkFailure=false; await page.locator('.voices-message button').click(); await page.locator('.voices-chapter-page').waitFor();
  assert.equal(await page.locator('#voicesReader:not([hidden])').isVisible(),true,'retry should finish opening the book without returning to the shelf');
  assert.deepEqual(errors,[]);
  console.log(`Mocked Drive browser flow passed: LHS-only authentication, prologue, illustrations, annotations, Chapter 01, reader modes, player controls, manual-turn continuity, no-audio fallback. Screenshots: ${output}/audiobook-mobile.png, ${output}/audiobook-desktop.png; images ${media}, audio ${audioMedia}.`);
