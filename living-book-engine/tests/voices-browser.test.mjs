@@ -54,6 +54,7 @@ try {
  await page.waitForFunction(()=>document.querySelector('[data-audio-duration]')?.textContent==='1:17');
  assert.match(await page.locator('[data-scene-narrator]').innerText(),/Lian Zhou/);
  assert.match(await page.locator('[data-scene-language]').innerText(),/Bahasa Indonesia/);
+ await new Promise((resolve,reject)=>{const deadline=Date.now()+5000;const check=()=>audioMedia===1?resolve():Date.now()>deadline?reject(new Error('audiobook audio request did not complete')):setTimeout(check,25);check()});
  assert.equal(audioMedia,1);
  assert.equal(await page.locator('.voices-chapter-page').isVisible(),false,'Audiobook mode should focus on narration art');
  await page.screenshot({path:`${output}/audiobook-mobile.png`,fullPage:true});
