@@ -10,7 +10,7 @@
   },
   "assets": {
     "provider": "google-drive",
-    "folderId": "1F7R8ax-m7uOcCmEWCIB3WPv6dgNumZYY",
+    "folderId": "1NTlN8NlgSYRaW0ufNZHNWxMf5e7Rz5Mz",
     "frontCover": "1j_TZyHEJr4xoT3_KqnoLaBcjHsHjSn0h",
     "backCover": "177cYJ7JtkgfcDUWgYWFMuoRGpbZG0tU0",
     "spine": "1vcl1SbJop10SgwOvWpGR56nOPIBsklXg",
@@ -23,11 +23,11 @@
       "zh-Hant": "灰燼中的哭聲",
       "id-ID": "Tangisan di Tengah Abu"
     },
-    "status": "EDITORIAL DRAFT v1.0 — READY FOR OWNER REVIEW",
+    "status": "FINAL APPROVED v1.0",
     "source": {
       "provider": "google-docs",
-      "document_id": "1T2w7Or7dHVaMwVxXIRN-iMg6F_AklukvB7PcLIcq0yI",
-      "document_version": "EDITORIAL DRAFT v1.0"
+      "document_id": "1jD-QfDLh-T3WHTRp6OdjoUvuFSn9XaJAlI3hYKBsfmg",
+      "document_version": "FINAL APPROVED v1.0"
     }
   },
   "chapters": [
@@ -41,8 +41,8 @@
       },
       "source": {
         "provider": "google-docs",
-        "document_id": "1Dp-6TroQAHZqUUpovdlEeVKBir7LhqWXLgQcNTn5nUg",
-        "document_version": "EDITORIAL DRAFT v0.9"
+        "document_id": "1hP9XQD7EHqeSMg5IzAt0l7hXMTDvGrTB1NKr1v6EcBw",
+        "document_version": "FINAL APPROVED v1.1"
       },
       "audio": [
         {
