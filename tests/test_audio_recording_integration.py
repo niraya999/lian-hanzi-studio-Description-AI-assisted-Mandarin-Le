@@ -45,7 +45,7 @@ class AudioRecordingIntegration(unittest.TestCase):
         self.assertIn("window.showTab('living-book')", HTML)
         LBE = (ROOT / 'living-book-engine' / 'drive-auth.mjs').read_text(encoding='utf-8')
         LBE_HTML = (ROOT / 'living-book-engine' / 'index.html').read_text(encoding='utf-8')
-        self.assertIn('broker.requestAccessToken()', LBE)
+        self.assertIn('broker.requestAccessToken({ force })', LBE)
         self.assertNotIn('accounts.google.com/gsi/client', LBE_HTML)
         self.assertIn("function bootReconnect(){if(!el('rememberDrive').checked||getPref(linked)!=='1')return;status('Katalog tersimpan tersedia. Ketuk Connect untuk menghubungkan Drive.')}", HTML)
 
