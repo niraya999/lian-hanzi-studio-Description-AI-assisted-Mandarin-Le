@@ -10,7 +10,7 @@ class ResponsiveLayoutTests(unittest.TestCase):
         self.assertIn("@media(min-width:1100px)", page)
         self.assertIn("@media(min-width:700px) and (max-width:1099px)", page)
         self.assertIn("@media(orientation:landscape) and (max-height:600px)", page)
-        self.assertIn("#hub,#library,#learn,#bcs,#lcf,#player,#settings,#editor,#reader", page)
+        self.assertIn("#hub,#library,#learn,#bcs,#lcf,#livingBook,#player,#settings,#editor,#reader", page)
         self.assertIn("#lcf iframe{display:block;width:100%;max-width:100%", page)
         self.assertIn("repeat(4,minmax(0,1fr))", page)
 

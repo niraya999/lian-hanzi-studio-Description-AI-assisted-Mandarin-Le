@@ -138,7 +138,7 @@ function createChapterPage(page) {
   return panel;
 }
 const words = {
-  en: { connect:'Connect Google Drive', ready:'Open book', required:'Connect Google Drive to view the original artwork.', title:'Title page', inner:'Inner cover', front:'Front cover', back:'Back cover', previous:'← Previous', next:'Next →', library:'Back to library', reconnect:'Drive access expired or was denied. Connect again.', pending:'Loading original artwork…', bookmark:'Title page', saved:'Bookmark saved', empty:'No bookmarks saved.' },
+  en: { connect:'Connect Google Drive through LHS', ready:'Open book', required:'Connect Google Drive through LHS to view the original artwork.', title:'Title page', inner:'Inner cover', front:'Front cover', back:'Back cover', previous:'← Previous', next:'Next →', library:'Back to library', reconnect:'LHS Drive access expired or was denied. Reconnect from LHS.', pending:'Loading original artwork…', bookmark:'Title page', saved:'Bookmark saved', empty:'No bookmarks saved.' },
   id: { connect:'Hubungkan Google Drive', ready:'Buka buku', required:'Hubungkan Google Drive untuk melihat gambar asli.', title:'Halaman judul', inner:'Sampul dalam', front:'Sampul depan', back:'Sampul belakang', previous:'← Sebelumnya', next:'Lanjut →', library:'Kembali ke perpustakaan', reconnect:'Akses Drive berakhir atau ditolak. Hubungkan kembali.', pending:'Memuat gambar asli…', bookmark:'Halaman judul', saved:'Penanda tersimpan', empty:'Belum ada penanda.' },
   'zh-Hant': { connect:'連接 Google 雲端硬碟', ready:'打開書本', required:'連接 Google 雲端硬碟以查看原始圖片。', title:'書名頁', inner:'內封', front:'封面', back:'封底', previous:'← 上一頁', next:'下一頁 →', library:'返回書架', reconnect:'雲端硬碟授權已過期或被拒絕，請重新連接。', pending:'正在載入原始圖片…', bookmark:'書名頁', saved:'書籤已儲存', empty:'尚未儲存書籤。' }
 };
@@ -245,14 +245,16 @@ async function move(delta) {
   book.classList.remove('voices-turn'); void book.offsetWidth; book.classList.add('voices-turn'); render();
 }
 async function connect() {
-  try { setStatus('Connecting Google Drive…'); await auth.connect(); await loadAll(); updateCard(); }
-  catch(error) { auth.clear(); setStatus(error.message); msg.textContent = error.message; }
+  try { setStatus('Connecting through LHS…'); await auth.connect(); connectButton.hidden=true; await loadAll(); updateCard(); }
+  catch(error) { auth.clear(); connectButton.hidden=false; setStatus(error.message); msg.textContent = error.message; }
 }
 function updateCard() { if (!state.urls.frontCover) return; const old=card.querySelector('.card-cover'); const img=image(state.urls.frontCover,'voices-card-cover','Voices of Dawn front cover'); if(old) old.replaceWith(img); }
-const connectButton = document.createElement('button'); connectButton.type='button'; connectButton.id='voicesConnect'; connectButton.className='secondary-button voices-connect'; connectButton.textContent='Connect Google Drive'; card.after(connectButton);
+const connectButton = document.createElement('button'); connectButton.type='button'; connectButton.id='voicesConnect'; connectButton.className='secondary-button voices-connect'; connectButton.textContent='Connect via LHS'; card.after(connectButton);
+async function syncConnectButton() { try { await auth.getAccessToken(); connectButton.hidden=true; } catch { connectButton.hidden=false; } }
+syncConnectButton();
 connectButton.addEventListener('click', connect);
 card.addEventListener('click', async () => {
-  try { await auth.getAccessToken(); } catch { setStatus(t('required')); connectButton.focus(); return; }
+  try { await auth.getAccessToken(); connectButton.hidden=true; } catch { connectButton.hidden=false; setStatus(t('required')); connectButton.focus(); return; }
   try { library.hidden=true; view.hidden=false; await loadAll(); const progress=await storage.getProgress(state.manifest.bookId); state.section=progress?.chapterId==='chapter-01'?'chapter-01':'prologue'; sectionSelect.value=state.section; state.chapterPage=state.section==='chapter-01'&&Number.isInteger(progress?.pageIndex)?progress.pageIndex:0; state.stage=state.section==='prologue'&&Number.isInteger(progress?.pageIndex)?Math.max(0,Math.min(lastStage()-1,progress.pageIndex)):0; state.readerMode='reading'; state.bookmarks=await storage.listBookmarks(state.manifest.bookId); if(state.section==='chapter-01') await loadChapterPages(); render(); }
   catch(error) { view.hidden=true; library.hidden=false; connectButton.focus(); }
 });
