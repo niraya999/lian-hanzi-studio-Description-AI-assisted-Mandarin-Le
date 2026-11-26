@@ -87,6 +87,8 @@ try {
  await page.locator('.voices-prologue-page').waitFor();
  for (let i=0;i<7;i++) await page.locator('#voicesReader [data-act=next]').click();
  assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Back cover');
+ for (let i=0;i<7;i++) await page.locator('#voicesReader [data-act=previous]').click();
+ await page.waitForFunction(()=>document.querySelector('#voicesReader [data-page-label]')?.textContent==='Prologue · Draft 1 / 6');
  await page.locator('#voicesReader [data-act=library]').click(); await page.locator('#library:not([hidden])').waitFor();
  const manifest=JSON.parse(await readFile(new URL('../voices-of-dawn-manifest.json',import.meta.url),'utf8')); manifest.chapters[0].audio=[];
  await page.route('**/voices-of-dawn-manifest.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify(manifest)}));
