@@ -34,13 +34,13 @@ export function createDriveAuthorization({ brokerProvider = () => {
     }
     const e = new Error('Connect Google Drive to view this book.'); e.code = 'AUTH_REQUIRED'; throw e;
   }
-  function connect() {
+  function connect({ force = false } = {}) {
     const broker = brokerProvider();
     if (!broker?.requestAccessToken) {
       const e = new Error('Open The Living Book from LHS Home and connect Google Drive there.'); e.code = 'AUTH_REQUIRED';
       return Promise.reject(e);
     }
-    return Promise.resolve(broker.requestAccessToken()).then(async session => {
+    return Promise.resolve(broker.requestAccessToken({ force })).then(async session => {
       if (!session?.token || !session?.expires) throw new Error('LHS did not return an active Google Drive session.');
       current = await identify(session.token, session.expires);
       return current;
