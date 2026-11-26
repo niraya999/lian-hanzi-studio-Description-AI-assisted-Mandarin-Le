@@ -223,6 +223,33 @@ async function loadAll() {
   } catch (error) { msg.textContent = error.code === 'AUTH_REQUIRED' ? t('reconnect') : `${error.message} — ${t('connect')}`; setStatus(t('required')); throw error; }
   finally { state.busy = false; }
 }
+async function restoreBookState() {
+  const progress=await storage.getProgress(state.manifest.bookId);
+  state.section=progress?.chapterId==='chapter-01'?'chapter-01':'prologue';
+  sectionSelect.value=state.section;
+  state.chapterPage=state.section==='chapter-01'&&Number.isInteger(progress?.pageIndex)?progress.pageIndex:0;
+  state.stage=state.section==='prologue'&&Number.isInteger(progress?.pageIndex)?Math.max(0,Math.min(lastStage()-1,progress.pageIndex)):0;
+  state.readerMode='reading';
+  state.bookmarks=await storage.listBookmarks(state.manifest.bookId);
+  if(state.section==='chapter-01') await loadChapterPages();
+  render();
+}
+function showBookLoadError(error) {
+  msg.replaceChildren(document.createTextNode(error.code === 'AUTH_REQUIRED' ? t('reconnect') : `${error.message} — `));
+  const retry=document.createElement('button');
+  retry.type='button';
+  retry.className='secondary-button';
+  retry.textContent=error.code === 'AUTH_REQUIRED' ? t('connect') : 'Retry loading artwork';
+  retry.addEventListener('click',async()=>{
+    retry.disabled=true;
+    try {
+      if(error.code === 'AUTH_REQUIRED') await auth.connect({force:true});
+      await loadAll();
+      await restoreBookState();
+    } catch(nextError) { showBookLoadError(nextError); }
+  });
+  msg.append(retry);
+}
 async function returnLibrary() {
   if(state.section==='chapter-01'&&state.chapterPages.length) await storage.saveProgress(state.manifest.bookId,{chapterId:'chapter-01',pageIndex:state.chapterPage,updatedAt:Date.now()});
   else if (state.stage >= 1 && state.stage < lastStage()) await storage.saveProgress(state.manifest.bookId,{chapterId:'prologue',pageIndex:state.stage,updatedAt:Date.now()});
@@ -255,8 +282,9 @@ syncConnectButton();
 connectButton.addEventListener('click', connect);
 card.addEventListener('click', async () => {
   try { await auth.getAccessToken(); connectButton.hidden=true; } catch { connectButton.hidden=false; setStatus(t('required')); connectButton.focus(); return; }
-  try { library.hidden=true; view.hidden=false; await loadAll(); const progress=await storage.getProgress(state.manifest.bookId); state.section=progress?.chapterId==='chapter-01'?'chapter-01':'prologue'; sectionSelect.value=state.section; state.chapterPage=state.section==='chapter-01'&&Number.isInteger(progress?.pageIndex)?progress.pageIndex:0; state.stage=state.section==='prologue'&&Number.isInteger(progress?.pageIndex)?Math.max(0,Math.min(lastStage()-1,progress.pageIndex)):0; state.readerMode='reading'; state.bookmarks=await storage.listBookmarks(state.manifest.bookId); if(state.section==='chapter-01') await loadChapterPages(); render(); }
-  catch(error) { view.hidden=true; library.hidden=false; connectButton.focus(); }
+  library.hidden=true; view.hidden=false;
+  try { await loadAll(); await restoreBookState(); }
+  catch(error) { showBookLoadError(error); }
 });
 view.addEventListener('click', async e => { const action=e.target.closest('[data-act]')?.dataset.act; if (!action) return; try { if(action==='library') await returnLibrary(); else if(action==='next') await move(1); else if(action==='previous') await move(-1); else if(action==='bookmarks') { bookmarkPanel.hidden=!bookmarkPanel.hidden; refreshBookmarks(); } else if(action==='bookmark' && (state.section==='chapter-01'||(state.stage>=2&&state.stage<lastStage()-1))) { const chapter=state.section==='chapter-01'; const pageId=chapter?state.chapterPages[state.chapterPage]?.id:(pageAtStage()?.id||'title-page'); await storage.addBookmark(state.manifest.bookId,{pageId,pageIndex:chapter?state.chapterPage:state.stage,chapterId:chapter?'chapter-01':pageAtStage()?'prologue':'front-matter',label:pageId,createdAt:Date.now()}); state.bookmarks=await storage.listBookmarks(state.manifest.bookId); msg.textContent=t('saved'); refreshBookmarks(); } } catch(error) { msg.textContent=error.message; } });
 book.addEventListener('pointerdown', e => {touch={x:e.clientX,y:e.clientY};});

@@ -26,6 +26,14 @@ test('reader requests access through the LHS broker only', async () => {
   assert.equal(requests, 1);
 });
 
+test('reader can force a fresh token through the LHS broker after Drive rejects the current token', async () => {
+  let request;
+  const session = { token: 'refreshed-lhs-token', expires: expires() };
+  const auth = createDriveAuthorization({ brokerProvider: () => ({ getAccessToken: async () => { throw new Error('expired'); }, requestAccessToken: async options => { request=options; return session; } }), fetchImpl: response, sessionStorage: storage() });
+  await auth.connect({ force: true });
+  assert.deepEqual(request, { force: true });
+});
+
 test('reader can reuse the existing same-tab LHS session when the broker is unavailable', async () => {
   const session = { token: 'same-tab-token', expires: expires() };
   const auth = createDriveAuthorization({ brokerProvider: () => null, fetchImpl: response, sessionStorage: storage(session) });
