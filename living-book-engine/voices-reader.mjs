@@ -3,6 +3,7 @@ import { createDriveAssetCache, createDriveAssetLoader } from './drive-assets.mj
 import { createIndexedDBStorage } from './storage.mjs';
 import { createDriveAudioLoader, createAudioPlaybackController } from './audiobook.mjs';
 import { extractChapterParagraphs, loadGoogleDocument, paginateChapterParagraphs } from './chapter-document.mjs';
+import { buildProloguePages } from './prologue-document.mjs';
 
 const $ = s => document.querySelector(s);
 const state = { manifest: null, stage: 0, urls: {}, bookmarks: [], layout: matchMedia('(orientation: landscape) and (min-width: 760px)').matches ? 'spread' : 'portrait', busy: false, prologue: null, showPinyin: false, showTranslation: false, section: 'prologue', chapterPage: 0, chapterPages: [], chapterDocument: null, readerMode: 'reading', audioUrl: '', audioLoading: false, audioError: '' };
@@ -107,32 +108,16 @@ function pageAtStage() { return state.prologue?.pages?.[state.stage - 3]; }
 function createProloguePage(page) {
   const panel = document.createElement('article'); panel.className = 'voices-prologue-page';
   panel.style.backgroundImage = 'url("' + state.urls.paperTexture + '")';
-  const heading = document.createElement('h2'); heading.textContent = state.prologue.title?.['zh-Hant'] || '黎明之前'; panel.append(heading);
+  const heading = document.createElement('h2'); heading.textContent = state.prologue.title?.['zh-Hant'] || '灰燼中的哭聲'; panel.append(heading);
   const marker = document.createElement('p'); marker.className='voices-page-number'; marker.textContent = 'PROLOGUE · ' + String(state.stage - 2).padStart(2,'0'); panel.append(marker);
-  if (page.illustration?.drive_file_id && state.urls[page.id]) panel.append(image(state.urls[page.id], 'voices-page-illustration', 'Prologue illustration'));
-  else { const missing = document.createElement('p'); missing.className='voices-art-pending'; missing.textContent='Illustration pending · ' + page.id; panel.append(missing); }
-  const locale = $('#languageSelect').value;
+  if (state.prologue.status) { const status = document.createElement('p'); status.className='voices-page-status'; status.textContent=state.prologue.status; panel.append(status); }
+  for (const artwork of page.images || []) {
+    const img=image(artwork.src,'voices-page-illustration',artwork.alt || 'Prologue illustration');
+    img.addEventListener('error',()=>img.remove(),{once:true}); panel.append(img);
+  }
   for (const block of page.blocks || []) {
-    const section = document.createElement('section'); section.className = 'voices-content-block'; section.dataset.type = block.type;
-    for (const sentence of block.sentences || []) {
-      const p = document.createElement('p'); p.className='voices-sentence'; p.dataset.sentenceId=sentence.id;
-      const original = sentence.text?.['zh-Hant'] || '';
-      const chars = Array.from(original);
-      const tokens = [...(sentence.tokens || [])].sort((a,b)=>a.start-b.start);
-      let pos=0;
-      for (const token of tokens) {
-        if (!Number.isInteger(token.start) || !Number.isInteger(token.end) || token.start < pos || token.end > chars.length || token.end <= token.start || chars.slice(token.start,token.end).join('') !== token.text) continue;
-        p.append(document.createTextNode(chars.slice(pos,token.start).join('')));
-        const button=document.createElement('button');button.type='button';button.className='voices-word';button.textContent=token.text;
-        button.addEventListener('click',()=>{readingTools.querySelector('.voices-gloss').textContent=token.text+' · '+(token.pinyin || '')+' · '+(token.meanings?.[locale === 'id' ? 'id-ID' : 'en'] || '');});
-        p.append(button);pos=token.end;
-      }
-      p.append(document.createTextNode(chars.slice(pos).join('')));
-      section.append(p);
-      if (state.showPinyin) {const pin=document.createElement('p');pin.className='voices-pinyin';pin.textContent=sentence.text?.pinyin || '';section.append(pin);}
-      if (state.showTranslation && locale !== 'zh-Hant') {const tr=document.createElement('p');tr.className='voices-translation';tr.textContent=sentence.text?.[locale==='id'?'id-ID':'en'] || '';section.append(tr);}
-    }
-    panel.append(section);
+    const p=document.createElement('p'); p.className=block.speaker?'voices-speaker-line':'voices-prologue-paragraph';
+    p.lang='id'; p.textContent=block.speaker?`(${block.speaker})`:block.text; panel.append(p);
   }
   return panel;
 }
@@ -211,7 +196,7 @@ function render() {
       if (isSpread) book.append(artwork('innerCover', 'voices-inner', t('inner')));
       book.append(createTitle());
     } else if (pageAtStage()) book.append(createProloguePage(pageAtStage()));
-    view.querySelector('[data-page-label]').textContent = (pageAtStage() ? 'Prologue ' + (state.stage-2) + ' / ' + state.prologue.pages.length : t(state.stage===0?'front':state.stage===1||state.stage===lastStage()-1?'inner':state.stage===2?'title':'back'));
+    view.querySelector('[data-page-label]').textContent = (pageAtStage() ? 'Prologue · Draft ' + (state.stage-2) + ' / ' + state.prologue.pages.length : t(state.stage===0?'front':state.stage===1||state.stage===lastStage()-1?'inner':state.stage===2?'title':'back'));
     view.querySelector('[data-act=previous]').disabled = state.stage === 0;
     view.querySelector('[data-act=next]').disabled = state.stage === lastStage();
     view.querySelector('[data-act=bookmark]').disabled = state.stage < 2 || state.stage >= lastStage()-1;
@@ -219,7 +204,7 @@ function render() {
   view.querySelector('[data-act=previous]').textContent = t('previous');
   view.querySelector('[data-act=next]').textContent = t('next');
   view.querySelector('[data-act=library]').textContent = '← ' + t('library');
-  readingTools.hidden = isChapter || !pageAtStage();
+  readingTools.hidden = true;
   view.querySelector('[data-audio-action="retry"]').hidden=!(playback.state().error || state.audioError);
   if(state.audioError) view.querySelector('.voices-audio-status').textContent=state.audioError;
   refreshBookmarks();
@@ -229,9 +214,10 @@ async function loadAll() {
   state.busy = true; msg.textContent = t('pending');
   try {
     for (const key of ['frontCover','backCover','spine','innerCover','paperTexture']) if (!state.urls[key]) state.urls[key] = await loadAsset(key);
-    for (const page of state.prologue?.pages || []) if (page.illustration?.drive_file_id && !state.urls[page.id]) {
-      try { state.urls[page.id] = await loader.load({bookId:state.manifest.bookId,fileId:page.illustration.drive_file_id}); }
-      catch (error) { console.warn('Illustration unavailable:', page.id, error); }
+    if (!state.prologue.pages?.length) {
+      const doc=await loadGoogleDocument({documentId:state.prologue.source.document_id,getAccessToken:()=>auth.getAccessToken()});
+      state.prologue.pages=buildProloguePages(extractChapterParagraphs(doc));
+      if (state.prologue.pages.length !== 6) throw new Error(`The current Drive prologue has ${state.prologue.pages.length} illustrated scenes; six are required.`);
     }
     msg.textContent = ''; setStatus(t('ready')); render();
   } catch (error) { msg.textContent = error.code === 'AUTH_REQUIRED' ? t('reconnect') : `${error.message} — ${t('connect')}`; setStatus(t('required')); throw error; }
@@ -267,7 +253,7 @@ const connectButton = document.createElement('button'); connectButton.type='butt
 connectButton.addEventListener('click', connect);
 card.addEventListener('click', async () => {
   try { await auth.getAccessToken(); } catch { setStatus(t('required')); connectButton.focus(); return; }
-  try { const progress=await storage.getProgress(state.manifest.bookId); state.section=progress?.chapterId==='chapter-01'?'chapter-01':'prologue'; sectionSelect.value=state.section; state.chapterPage=state.section==='chapter-01'&&Number.isInteger(progress?.pageIndex)?progress.pageIndex:0; state.stage=state.section==='prologue'&&Number.isInteger(progress?.pageIndex)?Math.max(0,Math.min(lastStage()-1,progress.pageIndex)):0; state.readerMode='reading'; state.bookmarks=await storage.listBookmarks(state.manifest.bookId); library.hidden=true; view.hidden=false; await loadAll(); if(state.section==='chapter-01') await loadChapterPages(); render(); }
+  try { library.hidden=true; view.hidden=false; await loadAll(); const progress=await storage.getProgress(state.manifest.bookId); state.section=progress?.chapterId==='chapter-01'?'chapter-01':'prologue'; sectionSelect.value=state.section; state.chapterPage=state.section==='chapter-01'&&Number.isInteger(progress?.pageIndex)?progress.pageIndex:0; state.stage=state.section==='prologue'&&Number.isInteger(progress?.pageIndex)?Math.max(0,Math.min(lastStage()-1,progress.pageIndex)):0; state.readerMode='reading'; state.bookmarks=await storage.listBookmarks(state.manifest.bookId); if(state.section==='chapter-01') await loadChapterPages(); render(); }
   catch(error) { view.hidden=true; library.hidden=false; connectButton.focus(); }
 });
 view.addEventListener('click', async e => { const action=e.target.closest('[data-act]')?.dataset.act; if (!action) return; try { if(action==='library') await returnLibrary(); else if(action==='next') await move(1); else if(action==='previous') await move(-1); else if(action==='bookmarks') { bookmarkPanel.hidden=!bookmarkPanel.hidden; refreshBookmarks(); } else if(action==='bookmark' && (state.section==='chapter-01'||(state.stage>=2&&state.stage<lastStage()-1))) { const chapter=state.section==='chapter-01'; const pageId=chapter?state.chapterPages[state.chapterPage]?.id:(pageAtStage()?.id||'title-page'); await storage.addBookmark(state.manifest.bookId,{pageId,pageIndex:chapter?state.chapterPage:state.stage,chapterId:chapter?'chapter-01':pageAtStage()?'prologue':'front-matter',label:pageId,createdAt:Date.now()}); state.bookmarks=await storage.listBookmarks(state.manifest.bookId); msg.textContent=t('saved'); refreshBookmarks(); } } catch(error) { msg.textContent=error.message; } });
@@ -280,10 +266,8 @@ window.addEventListener('pagehide', () => { loader.dispose(); playback.dispose()
 try {
   const response = await fetch('./voices-of-dawn-manifest.json'); if (!response.ok) throw new Error('Book manifest unavailable.');
   state.manifest = await response.json();
-  const pilotResponse = await fetch('./content/voices-of-dawn-prologue-pilot.json');
-  if (!pilotResponse.ok) throw new Error('Prologue pilot content unavailable.');
-  state.prologue = await pilotResponse.json();
-  if (state.prologue.chapter_id !== 'prologue' || state.prologue.pages?.length !== 6) throw new Error('Invalid prologue pilot.');
+  state.prologue = state.manifest.prologue;
+  if (state.prologue?.chapter_id !== 'prologue' || state.prologue.source?.provider !== 'google-docs') throw new Error('Invalid prologue source in the book manifest.');
   if (!state.manifest.bookId || state.manifest.assets?.provider !== 'google-drive') throw new Error('Invalid book manifest.');
   setStatus(t('required'));
   try { await auth.getAccessToken(); state.urls.frontCover=await loadAsset('frontCover'); updateCard(); setStatus(t('ready')); } catch { /* a user gesture is needed to connect */ }

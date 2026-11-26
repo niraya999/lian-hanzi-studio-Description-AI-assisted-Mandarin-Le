@@ -17,6 +17,19 @@
     "innerCover": "1-Uk34jBkqeF_rJ0rd9YyATvDmWGT-_0k",
     "paperTexture": "1xa-oVjLLKSC7BrU_YR5MmY8pl5eUpItH"
   },
+  "prologue": {
+    "chapter_id": "prologue",
+    "title": {
+      "zh-Hant": "灰燼中的哭聲",
+      "id-ID": "Tangisan di Tengah Abu"
+    },
+    "status": "EDITORIAL DRAFT v1.0 — READY FOR OWNER REVIEW",
+    "source": {
+      "provider": "google-docs",
+      "document_id": "1T2w7Or7dHVaMwVxXIRN-iMg6F_AklukvB7PcLIcq0yI",
+      "document_version": "EDITORIAL DRAFT v1.0"
+    }
+  },
   "chapters": [
     {
       "id": "chapter-01",

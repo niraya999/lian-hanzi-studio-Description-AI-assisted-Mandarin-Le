@@ -12,22 +12,34 @@ try {
  page.on('pageerror', e=>errors.push(e.message));
  await page.addInitScript(()=>{const p=HTMLMediaElement.prototype;Object.defineProperty(window,'__audioPlayCalls',{value:0,writable:true});Object.defineProperty(p,'duration',{configurable:true,get(){return 77.184}});Object.defineProperty(p,'paused',{configurable:true,get(){return !this._testPlaying}});Object.defineProperty(p,'currentTime',{configurable:true,get(){return this._testTime||0},set(v){this._testTime=Number(v);this.dispatchEvent(new Event('timeupdate'))}});Object.defineProperty(p,'load',{configurable:true,value(){if(this.src)queueMicrotask(()=>{this.dispatchEvent(new Event('loadstart'));this.dispatchEvent(new Event('loadedmetadata'));this.dispatchEvent(new Event('canplay'))})}});Object.defineProperty(p,'play',{configurable:true,value(){window.__audioPlayCalls++;this._testPlaying=true;this.dispatchEvent(new Event('play'));return Promise.resolve()}});Object.defineProperty(p,'pause',{configurable:true,value(){this._testPlaying=false;this.dispatchEvent(new Event('pause'))}})});
  await page.route('https://accounts.google.com/gsi/client',r=>r.fulfill({status:200,contentType:'text/javascript',body:`window.google={accounts:{oauth2:{initTokenClient:({callback})=>({requestAccessToken:()=>callback({access_token:'mock-token',expires_in:3600})})}}};`}));
- await page.route('https://docs.googleapis.com/**',r=>r.fulfill({json:{title:'Test Chapter',body:{content:[{paragraph:{elements:[{textRun:{content:'Pagi turun di 青林村.\n'}}]}},{paragraph:{elements:[{textRun:{content:'(Lian Xin)\n'}}]}},{paragraph:{elements:[{textRun:{content:'A'.repeat(1401)+'\n'}}]}},{paragraph:{elements:[{inlineObjectElement:{inlineObjectId:'art-1'}}]}}]},inlineObjects:{'art-1':{inlineObjectProperties:{embeddedObject:{title:'Dawn illustration',imageProperties:{contentUri:`data:image/png;base64,${png.toString('base64')}`}}}}}}}));
+ await page.route('https://docs.googleapis.com/**',r=>{
+  if(r.request().url().includes('1T2w7Or7dHVaMwVxXIRN-iMg6F_AklukvB7PcLIcq0yI')) {
+   const content=[],inlineObjects={};
+   const para=text=>({paragraph:{elements:[{textRun:{content:text+'\n'}}]}});
+   content.push(para('PROLOGUE · PROLOG'),para('灰燼中的哭聲'),para('Tangisan di Tengah Abu'));
+   for(let i=1;i<=6;i++) { const id=`prologue-art-${i}`; content.push({paragraph:{elements:[{inlineObjectElement:{inlineObjectId:id}}]}}); content.push(para(i===1?'Pada malam itu, anjing-anjing berhenti menggonggong.':`Paragraf sumber Drive ${i}.`)); inlineObjects[id]={inlineObjectProperties:{embeddedObject:{title:`Prologue scene ${i}`,imageProperties:{contentUri:`data:image/png;base64,${png.toString('base64')}`}}}}; }
+   content.push(para('破曉之聲'),para('VOICE OF DAWN'));
+   return r.fulfill({json:{title:'VoD — Prologue — 灰燼中的哭聲 — EDITORIAL DRAFT v1.0',body:{content},inlineObjects}});
+  }
+  return r.fulfill({json:{title:'Test Chapter',body:{content:[{paragraph:{elements:[{textRun:{content:'Pagi turun di 青林村.\n'}}]}},{paragraph:{elements:[{textRun:{content:'(Lian Xin)\n'}}]}},{paragraph:{elements:[{textRun:{content:'A'.repeat(1401)+'\n'}}]}},{paragraph:{elements:[{inlineObjectElement:{inlineObjectId:'art-1'}}]}}]},inlineObjects:{'art-1':{inlineObjectProperties:{embeddedObject:{title:'Dawn illustration',imageProperties:{contentUri:`data:image/png;base64,${png.toString('base64')}`}}}}}}});
+ });
  await page.route('https://www.googleapis.com/**',async r=>{const url=r.request().url(); if(unauthorized) return r.fulfill({status:401}); if(url.includes('/about?'))return r.fulfill({json:{user:{permissionId:'mock-account',emailAddress:'martin@installindonesia.org'}}}); const audio=url.includes('1HkgdFww3WUCB3jXh8S2sc1SG6QvdGp1b'); if(url.includes('alt=media')){if(audio){audioMedia++;return r.fulfill({contentType:'audio/mpeg',body:Buffer.from('private-pilot-audio')})}media++;return r.fulfill({contentType:'image/png',body:png});}return r.fulfill({json:{mimeType:audio?'audio/mpeg':'image/png',md5Checksum:'v1'}});});
  await page.goto(process.env.LIVING_BOOK_URL||'http://127.0.0.1:4173/'); await page.locator('#voicesConnect').waitFor();
  await page.locator('#voicesConnect').click(); await page.locator('.voices-card-cover').waitFor();
- await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden]) .voices-cover-image').waitFor(); assert.equal(media,6);
+ await page.locator('#voicesCard').click(); await page.locator('#voicesReader:not([hidden]) .voices-cover-image').waitFor(); assert.equal(media,5);
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-inner').waitFor();
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-title-page').waitFor(); assert.equal(await page.locator('.voices-title-page h1').innerText(),'破曉之聲');
  await page.locator('#voicesReader [data-act=bookmark]').click(); await page.waitForFunction(() => document.querySelector('[data-bookmark-count]')?.textContent === '1');
  await page.locator('#voicesReader [data-act=library]').click(); await page.reload(); await page.locator('.voices-card-cover').waitFor(); await page.locator('#bookCard').click(); await page.locator('#nextPage').click(); await page.locator('#book[data-state=content]').waitFor(); assert.equal(await page.locator('#bookmarkCount').innerText(),'0');
  await page.locator('#backLibrary').click(); await page.locator('#voicesCard').click(); await page.locator('.voices-title-page').waitFor();
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-prologue-page').waitFor();
- assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Prologue 1 / 6');
- await page.locator('.voices-page-illustration').waitFor(); assert.equal(await page.locator('.voices-art-pending').count(),0);
- await page.locator('[data-toggle="pinyin"]').check(); await page.locator('.voices-pinyin').first().waitFor();
- await page.locator('[data-toggle="translation"]').check(); await page.locator('.voices-translation').first().waitFor();
- await page.locator('.voices-word').first().click(); assert.ok((await page.locator('.voices-gloss').innerText()).length > 0);
+ assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Prologue · Draft 1 / 6');
+ assert.equal(await page.locator('.voices-prologue-page h2').innerText(),'灰燼中的哭聲');
+ assert.match(await page.locator('.voices-page-status').innerText(),/EDITORIAL DRAFT v1.0/);
+ assert.equal(await page.locator('.voices-prologue-paragraph').first().innerText(),'Pada malam itu, anjing-anjing berhenti menggonggong.');
+ assert.equal(await page.locator('.voices-page-illustration').count(),1);
+ for(let i=1;i<=6;i++) { assert.match(await page.locator('#voicesReader [data-page-label]').innerText(),new RegExp(`Draft ${i} / 6`)); assert.equal(await page.locator('.voices-page-illustration').count(),1); if(i<6) await page.locator('#voicesReader [data-act=next]').click(); }
+ for(let i=0;i<5;i++) await page.locator('#voicesReader [data-act=previous]').click();
 
  await page.locator('[data-section]').selectOption('chapter-01');
  await page.locator('.voices-chapter-page').waitFor();

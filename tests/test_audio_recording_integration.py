@@ -36,8 +36,9 @@ class AudioRecordingIntegration(unittest.TestCase):
         self.assertIn('new lamejs.Mp3Encoder(channelCount, 44100, bitrate)', WORKER)
         for path in ('./audio-recording-ui.js?v=1', './audio-recording-engine.mjs', './audio-capture.worklet.js', './mp3-encoder.worker.js', './vendor/audio/lamejs.iife.js'):
             self.assertIn(path, SW)
-        self.assertIn("lhs-shell-v126", SW)
-        self.assertIn('v0.8.5-beta', HTML)
+        self.assertIn("lhs-shell-v127", SW)
+        self.assertIn('v0.8.6-beta', HTML)
+        self.assertIn('id="openLivingBookEngine" href="./living-book-engine/"', HTML)
 
     def test_sync_is_manual_and_never_overwrites_a_drive_mp3(self):
         self.assertIn('Sync All Ready MP3', HTML)

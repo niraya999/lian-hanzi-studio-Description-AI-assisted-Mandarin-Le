@@ -1,43 +1,39 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-const pilot = JSON.parse(readFileSync(new URL('../content/voices-of-dawn-prologue-pilot.json', import.meta.url), 'utf8'));
+import { buildProloguePages } from '../prologue-document.mjs';
 
-test('six-page delegated draft has stable ordered page and block IDs', () => {
-  assert.equal(pilot.status, 'delegated_draft');
-  assert.equal(pilot.pages.length, 6);
-  assert.equal(pilot.pages.reduce((n, page) => n + page.blocks.length, 0), 12);
-  const ids = new Set();
-  for (const [index, page] of pilot.pages.entries()) {
-    assert.ok(page.id && !ids.has(page.id));
-    ids.add(page.id);
-    if (index < pilot.pages.length - 1) assert.equal(page.next_page_id, pilot.pages[index + 1].id);
-    else assert.ok(page.next_page_id, 'Final prologue page retains the future chapter reference');
-    for (const block of page.blocks) {
-      assert.ok(block.id && !ids.has(block.id));
-      ids.add(block.id);
-      for (const sentence of block.sentences) {
-        assert.ok(sentence.id && !ids.has(sentence.id));
-        ids.add(sentence.id);
-      }
-    }
-  }
+const manifest=JSON.parse(readFileSync(new URL('../voices-of-dawn-manifest.json',import.meta.url),'utf8'));
+
+test('prologue manifest points at current Drive editorial source and retains review status',()=>{
+  assert.equal(manifest.prologue.source.document_id,'1T2w7Or7dHVaMwVxXIRN-iMg6F_AklukvB7PcLIcq0yI');
+  assert.equal(manifest.prologue.source.document_version,'EDITORIAL DRAFT v1.0');
+  assert.match(manifest.prologue.status,/READY FOR OWNER REVIEW/);
+  assert.equal(manifest.prologue.title['zh-Hant'],'灰燼中的哭聲');
 });
 
-test('source annotations match Unicode code-point offsets', () => {
-  let checked = 0;
-  for (const page of pilot.pages) for (const block of page.blocks) for (const sentence of block.sentences) {
-    const chars = Array.from(sentence.text['zh-Hant']);
-    assert.ok(sentence.text.pinyin && sentence.text.en && sentence.text['id-ID']);
-    let previousEnd = 0;
-    for (const token of [...sentence.tokens].sort((a,b)=>a.start-b.start)) {
-      assert.ok(Number.isInteger(token.start) && Number.isInteger(token.end));
-      assert.ok(token.start >= previousEnd && token.end <= chars.length && token.end > token.start);
-      assert.equal(chars.slice(token.start, token.end).join(''), token.text, sentence.id);
-      assert.ok(token.meanings.en && token.meanings['id-ID']);
-      previousEnd = token.end;
-      checked++;
-    }
+test('Drive paragraphs become six illustrated pages without changing source text',()=>{
+  const paragraphs=[{text:'PROLOGUE · PROLOG',images:[]},{text:'灰燼中的哭聲',images:[]}];
+  for(let i=1;i<=6;i++) {
+    paragraphs.push({text:'',images:[{src:`https://drive.google.test/illustration-${i}`,alt:`Scene ${i}`}]});
+    paragraphs.push({text:i===1?'Pada malam itu, anjing-anjing berhenti menggonggong.':`Paragraph ${i}`,images:[],speaker:''});
   }
-  assert.ok(checked > 0);
+  paragraphs.push({text:'破曉之聲',images:[]},{text:'VOICE OF DAWN',images:[]});
+  const pages=buildProloguePages(paragraphs);
+  assert.equal(pages.length,6);
+  assert.deepEqual(pages.map(page=>page.id),Array.from({length:6},(_,i)=>`prologue-page-${String(i+1).padStart(2,'0')}`));
+  assert.ok(pages.every(page=>page.images.length===1));
+  assert.equal(pages[0].blocks[0].text,'Pada malam itu, anjing-anjing berhenti menggonggong.');
+  assert.equal(pages[5].blocks[0].text,'Paragraph 6');
+});
+
+test('Drive speaker labels remain distinct metadata and are displayed as speaker cues',()=>{
+  const pages=buildProloguePages([
+    {text:'cover title',images:[]},
+    {text:'',images:[{src:'https://drive.google.test/page-1'}]},
+    {text:'(Ibu)',speaker:'Ibu',images:[]},
+    {text:'“Pejamkan matamu. Jangan takut.”',images:[]}
+  ]);
+  assert.equal(pages[0].blocks[0].speaker,'Ibu');
+  assert.equal(pages[0].blocks[1].text,'“Pejamkan matamu. Jangan takut.”');
 });
