@@ -292,6 +292,18 @@ book.addEventListener('pointerup', e => {if(!touch)return; const dx=e.clientX-to
 window.addEventListener('keydown', e => {if(view.hidden || e.altKey || e.ctrlKey || e.metaKey) return;if(e.key==='Escape'){e.preventDefault();returnLibrary();} else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();move(e.key==='ArrowRight'?1:-1);}});
 $('#layoutToggle').addEventListener('click', () => {if (!view.hidden) {state.layout=state.layout==='spread'?'portrait':'spread'; render();}});
 $('#languageSelect').addEventListener('change', () => { connectButton.textContent=t('connect'); if(!view.hidden) render(); });
+window.addEventListener('message', async event => {
+  if (event.source !== window.parent || event.origin !== window.location.origin || event.data?.type !== 'lhs-drive-disconnected') return;
+  auth.clear();
+  state.busy=false;
+  state.audioError='';
+  state.audioLoading=false;
+  if (!view.hidden) await returnLibrary();
+  else { playback.dispose(); if(state.audioUrl) audioLoader.release(state.audioUrl); state.audioUrl=''; }
+  connectButton.hidden=false;
+  setStatus('Google Drive disconnected in LHS Settings.');
+  msg.textContent='Google Drive is disconnected. Reconnect through LHS Settings to continue.';
+});
 window.addEventListener('pagehide', () => { loader.dispose(); playback.dispose(); audioLoader.dispose(); });
 try {
   const response = await fetch('./voices-of-dawn-manifest.json'); if (!response.ok) throw new Error('Book manifest unavailable.');
