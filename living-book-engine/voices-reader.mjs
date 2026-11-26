@@ -138,9 +138,9 @@ function createChapterPage(page) {
   return panel;
 }
 const words = {
-  en: { connect:'Connect Google Drive through LHS', ready:'Open book', required:'Connect Google Drive through LHS to view the original artwork.', title:'Title page', inner:'Inner cover', front:'Front cover', back:'Back cover', previous:'← Previous', next:'Next →', library:'Back to library', reconnect:'LHS Drive access expired or was denied. Reconnect from LHS.', pending:'Loading original artwork…', bookmark:'Title page', saved:'Bookmark saved', empty:'No bookmarks saved.' },
-  id: { connect:'Hubungkan Google Drive', ready:'Buka buku', required:'Hubungkan Google Drive untuk melihat gambar asli.', title:'Halaman judul', inner:'Sampul dalam', front:'Sampul depan', back:'Sampul belakang', previous:'← Sebelumnya', next:'Lanjut →', library:'Kembali ke perpustakaan', reconnect:'Akses Drive berakhir atau ditolak. Hubungkan kembali.', pending:'Memuat gambar asli…', bookmark:'Halaman judul', saved:'Penanda tersimpan', empty:'Belum ada penanda.' },
-  'zh-Hant': { connect:'連接 Google 雲端硬碟', ready:'打開書本', required:'連接 Google 雲端硬碟以查看原始圖片。', title:'書名頁', inner:'內封', front:'封面', back:'封底', previous:'← 上一頁', next:'下一頁 →', library:'返回書架', reconnect:'雲端硬碟授權已過期或被拒絕，請重新連接。', pending:'正在載入原始圖片…', bookmark:'書名頁', saved:'書籤已儲存', empty:'尚未儲存書籤。' }
+  en: { connect:'Connect Google Drive through LHS', ready:'Open book', required:'Connect Google Drive through LHS to view the original artwork.', title:'Title page', inner:'Inner cover', front:'Front cover', back:'Back cover', previous:'← Previous', next:'Next →', library:'Back to library', reconnect:'LHS Drive access expired. Reconnect through LHS.', denied:'This Google account cannot access the Drive file (403). Reconnect and select an account with access.', pending:'Loading original artwork…', bookmark:'Title page', saved:'Bookmark saved', empty:'No bookmarks saved.' },
+  id: { connect:'Hubungkan Google Drive', ready:'Buka buku', required:'Hubungkan Google Drive untuk melihat gambar asli.', title:'Halaman judul', inner:'Sampul dalam', front:'Sampul depan', back:'Sampul belakang', previous:'← Sebelumnya', next:'Lanjut →', library:'Kembali ke perpustakaan', reconnect:'Akses Drive LHS kedaluwarsa (401). Hubungkan kembali melalui LHS.', denied:'Akun Google ini tidak memiliki akses ke file Drive (403). Hubungkan kembali dan pilih akun yang memiliki akses.', pending:'Memuat gambar asli…', bookmark:'Halaman judul', saved:'Penanda tersimpan', empty:'Belum ada penanda.' },
+  'zh-Hant': { connect:'連接 Google 雲端硬碟', ready:'打開書本', required:'連接 Google 雲端硬碟以查看原始圖片。', title:'書名頁', inner:'內封', front:'封面', back:'封底', previous:'← 上一頁', next:'下一頁 →', library:'返回書架', reconnect:'LHS 雲端硬碟授權已過期（401），請透過 LHS 重新連接。', denied:'此 Google 帳戶無法存取雲端硬碟檔案（403）。請重新連接並選擇有權限的帳戶。', pending:'正在載入原始圖片…', bookmark:'書名頁', saved:'書籤已儲存', empty:'尚未儲存書籤。' }
 };
 function t(key) { return (words[$('#languageSelect').value] || words.en)[key]; }
 function safeAsset(id) { return state.manifest?.assets?.[id]; }
@@ -220,7 +220,7 @@ async function loadAll() {
       if (state.prologue.pages.length !== 6) throw new Error(`The current Drive prologue has ${state.prologue.pages.length} illustrated scenes; six are required.`);
     }
     msg.textContent = ''; setStatus(t('ready')); render();
-  } catch (error) { msg.textContent = error.code === 'AUTH_REQUIRED' ? t('reconnect') : `${error.message} — ${t('connect')}`; setStatus(t('required')); throw error; }
+  } catch (error) { msg.textContent = error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — ${t('connect')}`; setStatus(t('required')); throw error; }
   finally { state.busy = false; }
 }
 async function restoreBookState() {
@@ -235,7 +235,7 @@ async function restoreBookState() {
   render();
 }
 function showBookLoadError(error) {
-  msg.replaceChildren(document.createTextNode(error.code === 'AUTH_REQUIRED' ? t('reconnect') : `${error.message} — `));
+  msg.replaceChildren(document.createTextNode(error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — `));
   const retry=document.createElement('button');
   retry.type='button';
   retry.className='secondary-button';
