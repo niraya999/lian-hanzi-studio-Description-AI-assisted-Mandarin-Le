@@ -121,7 +121,7 @@ try {
  await page.waitForFunction(()=>document.querySelector('.voices-message')?.textContent.includes('insufficientFilePermissions'));
  assert.match(await page.locator('.voices-message').innerText(),/Connected account: martin@installindonesia\.org\./,'Docs API 403 should identify the connected Google account');
  assert.match(await page.locator('.voices-message').innerText(),/Drive reason: insufficientFilePermissions\./,'Docs API 403 should show the Google reason');
- docsDeniedStatus=0; await page.locator('.voices-message button').click(); await page.locator('.voices-prologue-page').waitFor();
+ docsDeniedStatus=0; await page.locator('.voices-message button').click(); await page.locator('.voices-chapter-page').waitFor();
  assert.equal(await page.evaluate(()=>window.__lhsAuthRequests),3,'a denied Docs request should reconnect through LHS once');
  assert.deepEqual(errors,[]);
  console.log(`Mocked Drive browser flow passed: LHS-only authentication, prologue, illustrations, annotations, Chapter 01, reader modes, player controls, manual-turn continuity, no-audio fallback. Screenshots: ${output}/audiobook-mobile.png, ${output}/audiobook-desktop.png; images ${media}, audio ${audioMedia}.`);
