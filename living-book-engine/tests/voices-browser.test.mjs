@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdir, readFile } from 'node:fs/promises';
 
 const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH}:{})});
-const errors=[]; let media=0; let audioMedia=0; let driveDeniedStatus=0; let artworkFailure=false;
+const errors=[]; let media=0; let audioMedia=0; let driveDeniedStatus=0; let docsDeniedStatus=0; let artworkFailure=false;
 const output=process.env.LIVING_BOOK_SCREENSHOTS||'/tmp/living-book-engine-screenshots';
 await mkdir(output,{recursive:true});
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZ0AAAAASUVORK5CYII=','base64');
@@ -13,6 +13,7 @@ try {
  await page.addInitScript(()=>{window.__lhsAuthRequests=Number(sessionStorage.getItem('test.lhsAuthRequests')||'0');window.__lhsAuthOptions=[];window.lhsDriveBroker={getAccessToken:async()=>{const saved=JSON.parse(sessionStorage.getItem('lhs.drive.session.v1')||'null');if(!saved?.token||saved.expires<Date.now()+60000)throw new Error('not connected');return saved},requestAccessToken:async options=>{window.__lhsAuthRequests++;window.__lhsAuthOptions.push(options);sessionStorage.setItem('test.lhsAuthRequests',String(window.__lhsAuthRequests));const session={token:'mock-token',expires:Date.now()+3600000};sessionStorage.setItem('lhs.drive.session.v1',JSON.stringify(session));return session}};const p=HTMLMediaElement.prototype;Object.defineProperty(window,'__audioPlayCalls',{value:0,writable:true});Object.defineProperty(p,'duration',{configurable:true,get(){return 77.184}});Object.defineProperty(p,'paused',{configurable:true,get(){return !this._testPlaying}});Object.defineProperty(p,'currentTime',{configurable:true,get(){return this._testTime||0},set(v){this._testTime=Number(v);this.dispatchEvent(new Event('timeupdate'))}});Object.defineProperty(p,'load',{configurable:true,value(){if(this.src)queueMicrotask(()=>{this.dispatchEvent(new Event('loadstart'));this.dispatchEvent(new Event('loadedmetadata'));this.dispatchEvent(new Event('canplay'))})}});Object.defineProperty(p,'play',{configurable:true,value(){window.__audioPlayCalls++;this._testPlaying=true;this.dispatchEvent(new Event('play'));return Promise.resolve()}});Object.defineProperty(p,'pause',{configurable:true,value(){this._testPlaying=false;this.dispatchEvent(new Event('pause'))}})});
  await page.route('https://docs.googleapis.com/**',r=>{
   if(r.request().url().includes('1jD-QfDLh-T3WHTRp6OdjoUvuFSn9XaJAlI3hYKBsfmg')) {
+   if(docsDeniedStatus===403) return r.fulfill({status:403,contentType:'application/json',body:JSON.stringify({error:{message:'Document access denied.',errors:[{reason:'insufficientFilePermissions'}]}})});
    const content=[],inlineObjects={};
    const para=text=>({paragraph:{elements:[{textRun:{content:text+'\n'}}]}});
    content.push(para('PROLOGUE · PROLOG'),para('灰燼中的哭聲'),para('Tangisan di Tengah Abu'));
@@ -116,6 +117,12 @@ try {
  driveDeniedStatus=0; await page.locator('.voices-message button').click(); await page.locator('.voices-chapter-page').waitFor();
  assert.equal(await page.evaluate(()=>window.__lhsAuthRequests),2,'a denied Drive file should request one LHS reconnect');
  assert.equal(await page.evaluate(()=>window.__lhsAuthOptions.at(-1)?.force),true,'a denied Drive file should request account selection during forced reconnect');
+ await page.locator('#voicesReader [data-act=library]').click(); docsDeniedStatus=403; await page.reload(); await page.locator('#voicesCard').waitFor(); await page.locator('#voicesCard').click();
+ await page.waitForFunction(()=>document.querySelector('.voices-message')?.textContent.includes('insufficientFilePermissions'));
+ assert.match(await page.locator('.voices-message').innerText(),/Connected account: martin@installindonesia\.org\./,'Docs API 403 should identify the connected Google account');
+ assert.match(await page.locator('.voices-message').innerText(),/Drive reason: insufficientFilePermissions\./,'Docs API 403 should show the Google reason');
+ docsDeniedStatus=0; await page.locator('.voices-message button').click(); await page.locator('.voices-prologue-page').waitFor();
+ assert.equal(await page.evaluate(()=>window.__lhsAuthRequests),3,'a denied Docs request should reconnect through LHS once');
  assert.deepEqual(errors,[]);
  console.log(`Mocked Drive browser flow passed: LHS-only authentication, prologue, illustrations, annotations, Chapter 01, reader modes, player controls, manual-turn continuity, no-audio fallback. Screenshots: ${output}/audiobook-mobile.png, ${output}/audiobook-desktop.png; images ${media}, audio ${audioMedia}.`);
  await ctx.close();
