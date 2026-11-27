@@ -6,7 +6,7 @@ import { extractChapterParagraphs, loadGoogleDocument, paginateChapterParagraphs
 import { buildProloguePages } from './prologue-document.mjs';
 
 const $ = s => document.querySelector(s);
-const state = { manifest: null, stage: 0, urls: {}, bookmarks: [], layout: matchMedia('(orientation: landscape) and (min-width: 760px)').matches ? 'spread' : 'portrait', busy: false, prologue: null, showPinyin: false, showTranslation: false, section: 'prologue', chapterPage: 0, chapterPages: [], chapterDocument: null, readerMode: 'reading', audioUrl: '', audioLoading: false, audioError: '' };
+const state = { manifest: null, stage: 0, urls: {}, artworkErrors: [], bookmarks: [], layout: matchMedia('(orientation: landscape) and (min-width: 760px)').matches ? 'spread' : 'portrait', busy: false, prologue: null, showPinyin: false, showTranslation: false, section: 'prologue', chapterPage: 0, chapterPages: [], chapterDocument: null, readerMode: 'reading', audioUrl: '', audioLoading: false, audioError: '' };
 const auth = createDriveAuthorization();
 const storage = createIndexedDBStorage();
 const loader = createDriveAssetLoader({ getAccessToken: () => auth.getAccessToken(), cache: createDriveAssetCache() });
@@ -211,15 +211,28 @@ function render() {
 }
 async function loadAsset(name) { return loader.load({bookId:state.manifest.bookId,fileId:safeAsset(name)}); }
 async function loadAll() {
-  state.busy = true; msg.textContent = t('pending');
+  state.busy = true; state.artworkErrors = []; msg.textContent = t('pending');
   try {
-    for (const key of ['frontCover','backCover','spine','innerCover','paperTexture']) if (!state.urls[key]) state.urls[key] = await loadAsset(key);
+    // Load the approved Google Doc first: an inaccessible legacy cover must not block the book text.
     if (!state.prologue.pages?.length) {
       const doc=await loadGoogleDocument({documentId:state.prologue.source.document_id,getAccessToken:()=>auth.getAccessToken()});
       state.prologue.pages=buildProloguePages(extractChapterParagraphs(doc));
       if (state.prologue.pages.length !== 6) throw new Error(`The current Drive prologue has ${state.prologue.pages.length} illustrated scenes; six are required.`);
     }
-    msg.textContent = ''; setStatus(t('ready')); render();
+    // Cover artwork is optional. Keep going if an asset belongs to a Drive folder the account cannot read.
+    for (const key of ['frontCover','backCover','spine','innerCover','paperTexture']) {
+      if (state.urls[key]) continue;
+      try { state.urls[key] = await loadAsset(key); }
+      catch (error) {
+        state.urls[key] = '';
+        state.artworkErrors.push({ key, fileId: safeAsset(key), status: error.status || 0, message: error.message });
+      }
+    }
+    if (state.artworkErrors.length) {
+      const details = state.artworkErrors.map(item => `${item.key} (${item.fileId || 'no file ID'}): ${item.status || item.message}`).join('; ');
+      msg.textContent = `Book text loaded. Some artwork is unavailable: ${details}`;
+    } else msg.textContent = '';
+    setStatus(t('ready')); render();
   } catch (error) {
     msg.replaceChildren(document.createTextNode(error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — ${t('connect')}`));
     if (error.status === 403) {
