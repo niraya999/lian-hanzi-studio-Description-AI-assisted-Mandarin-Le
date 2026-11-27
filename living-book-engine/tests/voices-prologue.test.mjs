@@ -5,10 +5,13 @@ import { buildProloguePages } from '../prologue-document.mjs';
 
 const manifest=JSON.parse(readFileSync(new URL('../voices-of-dawn-manifest.json',import.meta.url),'utf8'));
 
-test('prologue manifest points at current Drive editorial source and retains review status',()=>{
-  assert.equal(manifest.prologue.source.document_id,'1T2w7Or7dHVaMwVxXIRN-iMg6F_AklukvB7PcLIcq0yI');
-  assert.equal(manifest.prologue.source.document_version,'EDITORIAL DRAFT v1.0');
-  assert.match(manifest.prologue.status,/READY FOR OWNER REVIEW/);
+test('prologue manifest points at the approved Drive source',()=>{
+  assert.equal(manifest.assets.folderId,'1NTlN8NlgSYRaW0ufNZHNWxMf5e7Rz5Mz');
+  assert.equal(manifest.prologue.source.document_id,'1jD-QfDLh-T3WHTRp6OdjoUvuFSn9XaJAlI3hYKBsfmg');
+  assert.equal(manifest.prologue.source.document_version,'FINAL APPROVED v1.0');
+  assert.equal(manifest.prologue.status,'FINAL APPROVED v1.0');
+  assert.equal(manifest.chapters[0].source.document_id,'1hP9XQD7EHqeSMg5IzAt0l7hXMTDvGrTB1NKr1v6EcBw');
+  assert.equal(manifest.chapters[0].source.document_version,'FINAL APPROVED v1.1');
   assert.equal(manifest.prologue.title['zh-Hant'],'灰燼中的哭聲');
 });
 
