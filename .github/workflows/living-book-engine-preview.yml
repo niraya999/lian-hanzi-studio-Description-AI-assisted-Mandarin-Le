@@ -20,7 +20,7 @@ jobs:
           npm install --no-save playwright
           npx playwright install chromium
       - name: Run unit and integration tests
-        run: node --test living-book-engine/tests/engine.test.mjs living-book-engine/tests/drive-auth.test.mjs living-book-engine/tests/drive-assets.test.mjs living-book-engine/tests/voices-prologue.test.mjs living-book-engine/tests/audiobook.test.mjs
+        run: node --test living-book-engine/tests/engine.test.mjs living-book-engine/tests/drive-auth.test.mjs living-book-engine/tests/drive-assets.test.mjs living-book-engine/tests/chapter-document.test.mjs living-book-engine/tests/voices-prologue.test.mjs living-book-engine/tests/audiobook.test.mjs
       - name: Serve the standalone reader
         run: |
           python3 -m http.server 4173 --bind 127.0.0.1 --directory living-book-engine >/tmp/living-book-http.log 2>&1 &
