@@ -220,7 +220,14 @@ async function loadAll() {
       if (state.prologue.pages.length !== 6) throw new Error(`The current Drive prologue has ${state.prologue.pages.length} illustrated scenes; six are required.`);
     }
     msg.textContent = ''; setStatus(t('ready')); render();
-  } catch (error) { msg.textContent = error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — ${t('connect')}`; setStatus(t('required')); throw error; }
+  } catch (error) {
+    msg.replaceChildren(document.createTextNode(error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — ${t('connect')}`));
+    if (error.status === 403) {
+      const details = [error.accountEmail ? `Connected account: ${error.accountEmail}.` : '', error.driveReason ? `Drive reason: ${error.driveReason}.` : '', error.driveMessage && error.driveMessage !== error.message ? error.driveMessage : ''].filter(Boolean).join(' ');
+      if (details) msg.append(document.createElement('br'), document.createTextNode(details));
+    }
+    setStatus(t('required')); throw error;
+  }
   finally { state.busy = false; }
 }
 async function restoreBookState() {
@@ -238,7 +245,7 @@ function showBookLoadError(error) {
   const message = error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — `;
   msg.replaceChildren(document.createTextNode(message));
   if (error.status === 403) {
-    const details = [error.accountEmail ? `Connected account: ${error.accountEmail}.` : '', error.driveReason ? `Drive reason: ${error.driveReason}.` : ''].filter(Boolean).join(' ');
+    const details = [error.accountEmail ? `Connected account: ${error.accountEmail}.` : '', error.driveReason ? `Drive reason: ${error.driveReason}.` : '', error.driveMessage && error.driveMessage !== error.message ? error.driveMessage : ''].filter(Boolean).join(' ');
     if (details) msg.append(document.createElement('br'), document.createTextNode(details));
   }
   const retry=document.createElement('button');
