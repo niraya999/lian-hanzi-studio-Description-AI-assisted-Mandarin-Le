@@ -196,7 +196,7 @@ function render() {
       if (isSpread) book.append(artwork('innerCover', 'voices-inner', t('inner')));
       book.append(createTitle());
     } else if (pageAtStage()) book.append(createProloguePage(pageAtStage()));
-    view.querySelector('[data-page-label]').textContent = (pageAtStage() ? 'Prologue · Draft ' + (state.stage-2) + ' / ' + state.prologue.pages.length : t(state.stage===0?'front':state.stage===1||state.stage===lastStage()-1?'inner':state.stage===2?'title':'back'));
+    view.querySelector('[data-page-label]').textContent = (pageAtStage() ? 'Prologue · Page ' + (state.stage-2) + ' / ' + state.prologue.pages.length : t(state.stage===0?'front':state.stage===1||state.stage===lastStage()-1?'inner':state.stage===2?'title':'back'));
     view.querySelector('[data-act=previous]').disabled = state.stage === 0;
     view.querySelector('[data-act=next]').disabled = state.stage === lastStage();
     view.querySelector('[data-act=bookmark]').disabled = state.stage < 2 || state.stage >= lastStage()-1;
