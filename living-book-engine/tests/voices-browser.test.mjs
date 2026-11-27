@@ -12,13 +12,13 @@ try {
  page.on('pageerror', e=>errors.push(e.message));
  await page.addInitScript(()=>{window.__lhsAuthRequests=Number(sessionStorage.getItem('test.lhsAuthRequests')||'0');window.__lhsAuthOptions=[];window.lhsDriveBroker={getAccessToken:async()=>{const saved=JSON.parse(sessionStorage.getItem('lhs.drive.session.v1')||'null');if(!saved?.token||saved.expires<Date.now()+60000)throw new Error('not connected');return saved},requestAccessToken:async options=>{window.__lhsAuthRequests++;window.__lhsAuthOptions.push(options);sessionStorage.setItem('test.lhsAuthRequests',String(window.__lhsAuthRequests));const session={token:'mock-token',expires:Date.now()+3600000};sessionStorage.setItem('lhs.drive.session.v1',JSON.stringify(session));return session}};const p=HTMLMediaElement.prototype;Object.defineProperty(window,'__audioPlayCalls',{value:0,writable:true});Object.defineProperty(p,'duration',{configurable:true,get(){return 77.184}});Object.defineProperty(p,'paused',{configurable:true,get(){return !this._testPlaying}});Object.defineProperty(p,'currentTime',{configurable:true,get(){return this._testTime||0},set(v){this._testTime=Number(v);this.dispatchEvent(new Event('timeupdate'))}});Object.defineProperty(p,'load',{configurable:true,value(){if(this.src)queueMicrotask(()=>{this.dispatchEvent(new Event('loadstart'));this.dispatchEvent(new Event('loadedmetadata'));this.dispatchEvent(new Event('canplay'))})}});Object.defineProperty(p,'play',{configurable:true,value(){window.__audioPlayCalls++;this._testPlaying=true;this.dispatchEvent(new Event('play'));return Promise.resolve()}});Object.defineProperty(p,'pause',{configurable:true,value(){this._testPlaying=false;this.dispatchEvent(new Event('pause'))}})});
  await page.route('https://docs.googleapis.com/**',r=>{
-  if(r.request().url().includes('1T2w7Or7dHVaMwVxXIRN-iMg6F_AklukvB7PcLIcq0yI')) {
+  if(r.request().url().includes('1jD-QfDLh-T3WHTRp6OdjoUvuFSn9XaJAlI3hYKBsfmg')) {
    const content=[],inlineObjects={};
    const para=text=>({paragraph:{elements:[{textRun:{content:text+'\n'}}]}});
    content.push(para('PROLOGUE · PROLOG'),para('灰燼中的哭聲'),para('Tangisan di Tengah Abu'));
    for(let i=1;i<=6;i++) { const id=`prologue-art-${i}`; content.push({paragraph:{elements:[{inlineObjectElement:{inlineObjectId:id}}]}}); content.push(para(i===1?'Pada malam itu, anjing-anjing berhenti menggonggong.':`Paragraf sumber Drive ${i}.`)); inlineObjects[id]={inlineObjectProperties:{embeddedObject:{title:`Prologue scene ${i}`,imageProperties:{contentUri:`data:image/png;base64,${png.toString('base64')}`}}}}; }
    content.push(para('破曉之聲'),para('VOICE OF DAWN'));
-   return r.fulfill({json:{title:'VoD — Prologue — 灰燼中的哭聲 — EDITORIAL DRAFT v1.0',body:{content},inlineObjects}});
+   return r.fulfill({json:{title:'VoD — Prologue — 灰燼中的哭聲 — FINAL APPROVED v1.0',body:{content},inlineObjects}});
   }
   return r.fulfill({json:{title:'Test Chapter',body:{content:[{paragraph:{elements:[{textRun:{content:'Pagi turun di 青林村.\n'}}]}},{paragraph:{elements:[{textRun:{content:'(Lian Xin)\n'}}]}},{paragraph:{elements:[{textRun:{content:'A'.repeat(1401)+'\n'}}]}},{paragraph:{elements:[{inlineObjectElement:{inlineObjectId:'art-1'}}]}}]},inlineObjects:{'art-1':{inlineObjectProperties:{embeddedObject:{title:'Dawn illustration',imageProperties:{contentUri:`data:image/png;base64,${png.toString('base64')}`}}}}}}});
  });
@@ -32,12 +32,12 @@ try {
  await page.locator('#voicesReader [data-act=library]').click(); await page.reload(); await page.locator('.voices-card-cover').waitFor(); assert.equal(await page.locator('#voicesConnect').isVisible(),false,'an active LHS session should hide the reader connect prompt'); await page.locator('#bookCard').click(); await page.locator('#nextPage').click(); await page.locator('#book[data-state=content]').waitFor(); assert.equal(await page.locator('#bookmarkCount').innerText(),'0');
  await page.locator('#backLibrary').click(); await page.locator('#voicesCard').click(); await page.locator('.voices-title-page').waitFor(); assert.equal(await page.evaluate(()=>window.__lhsAuthRequests),1,'reader reload must reuse the LHS session without requesting Google again');
  await page.locator('#voicesReader [data-act=next]').click(); await page.locator('.voices-prologue-page').waitFor();
- assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Prologue · Draft 1 / 6');
+ assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Prologue · Page 1 / 6');
  assert.equal(await page.locator('.voices-prologue-page h2').innerText(),'灰燼中的哭聲');
- assert.match(await page.locator('.voices-page-status').innerText(),/EDITORIAL DRAFT v1.0/);
+ assert.match(await page.locator('.voices-page-status').innerText(),/FINAL APPROVED v1.0/);
  assert.equal(await page.locator('.voices-prologue-paragraph').first().innerText(),'Pada malam itu, anjing-anjing berhenti menggonggong.');
  assert.equal(await page.locator('.voices-page-illustration').count(),1);
- for(let i=1;i<=6;i++) { assert.match(await page.locator('#voicesReader [data-page-label]').innerText(),new RegExp(`Draft ${i} / 6`)); assert.equal(await page.locator('.voices-page-illustration').count(),1); if(i<6) { await page.locator('#voicesReader [data-act=next]').click(); await page.waitForFunction(expected=>document.querySelector('#voicesReader [data-page-label]')?.textContent===expected,`Prologue · Draft ${i+1} / 6`); } }
+ for(let i=1;i<=6;i++) { assert.match(await page.locator('#voicesReader [data-page-label]').innerText(),new RegExp(`Page ${i} / 6`)); assert.equal(await page.locator('.voices-page-illustration').count(),1); if(i<6) { await page.locator('#voicesReader [data-act=next]').click(); await page.waitForFunction(expected=>document.querySelector('#voicesReader [data-page-label]')?.textContent===expected,`Prologue · Page ${i+1} / 6`); } }
  for(let i=0;i<5;i++) await page.locator('#voicesReader [data-act=previous]').click();
 
  await page.locator('[data-section]').selectOption('chapter-01');
@@ -88,7 +88,7 @@ try {
  for (let i=0;i<7;i++) await page.locator('#voicesReader [data-act=next]').click();
  assert.equal(await page.locator('#voicesReader [data-page-label]').innerText(),'Back cover');
  for (let i=0;i<7;i++) await page.locator('#voicesReader [data-act=previous]').click();
- await page.waitForFunction(()=>document.querySelector('#voicesReader [data-page-label]')?.textContent==='Prologue · Draft 1 / 6');
+ await page.waitForFunction(()=>document.querySelector('#voicesReader [data-page-label]')?.textContent==='Prologue · Page 1 / 6');
  await page.locator('#voicesReader [data-act=library]').click(); await page.locator('#library:not([hidden])').waitFor();
  const manifest=JSON.parse(await readFile(new URL('../voices-of-dawn-manifest.json',import.meta.url),'utf8')); manifest.chapters[0].audio=[];
  await page.route('**/voices-of-dawn-manifest.json',r=>r.fulfill({contentType:'application/json',body:JSON.stringify(manifest)}));
