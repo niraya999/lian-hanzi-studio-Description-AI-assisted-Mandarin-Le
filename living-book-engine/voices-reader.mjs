@@ -196,7 +196,7 @@ function render() {
       if (isSpread) book.append(artwork('innerCover', 'voices-inner', t('inner')));
       book.append(createTitle());
     } else if (pageAtStage()) book.append(createProloguePage(pageAtStage()));
-    view.querySelector('[data-page-label]').textContent = (pageAtStage() ? 'Prologue · Draft ' + (state.stage-2) + ' / ' + state.prologue.pages.length : t(state.stage===0?'front':state.stage===1||state.stage===lastStage()-1?'inner':state.stage===2?'title':'back'));
+    view.querySelector('[data-page-label]').textContent = (pageAtStage() ? 'Prologue · Page ' + (state.stage-2) + ' / ' + state.prologue.pages.length : t(state.stage===0?'front':state.stage===1||state.stage===lastStage()-1?'inner':state.stage===2?'title':'back'));
     view.querySelector('[data-act=previous]').disabled = state.stage === 0;
     view.querySelector('[data-act=next]').disabled = state.stage === lastStage();
     view.querySelector('[data-act=bookmark]').disabled = state.stage < 2 || state.stage >= lastStage()-1;
@@ -220,7 +220,14 @@ async function loadAll() {
       if (state.prologue.pages.length !== 6) throw new Error(`The current Drive prologue has ${state.prologue.pages.length} illustrated scenes; six are required.`);
     }
     msg.textContent = ''; setStatus(t('ready')); render();
-  } catch (error) { msg.textContent = error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — ${t('connect')}`; setStatus(t('required')); throw error; }
+  } catch (error) {
+    msg.replaceChildren(document.createTextNode(error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — ${t('connect')}`));
+    if (error.status === 403) {
+      const details = [error.accountEmail ? `Connected account: ${error.accountEmail}.` : '', error.driveReason ? `Drive reason: ${error.driveReason}.` : '', error.driveMessage && error.driveMessage !== error.message ? error.driveMessage : ''].filter(Boolean).join(' ');
+      if (details) msg.append(document.createElement('br'), document.createTextNode(details));
+    }
+    setStatus(t('required')); throw error;
+  }
   finally { state.busy = false; }
 }
 async function restoreBookState() {
@@ -238,7 +245,7 @@ function showBookLoadError(error) {
   const message = error.code === 'AUTH_REQUIRED' ? (error.status === 403 ? t('denied') : t('reconnect')) : `${error.message} — `;
   msg.replaceChildren(document.createTextNode(message));
   if (error.status === 403) {
-    const details = [error.accountEmail ? `Connected account: ${error.accountEmail}.` : '', error.driveReason ? `Drive reason: ${error.driveReason}.` : ''].filter(Boolean).join(' ');
+    const details = [error.accountEmail ? `Connected account: ${error.accountEmail}.` : '', error.driveReason ? `Drive reason: ${error.driveReason}.` : '', error.driveMessage && error.driveMessage !== error.message ? error.driveMessage : ''].filter(Boolean).join(' ');
     if (details) msg.append(document.createElement('br'), document.createTextNode(details));
   }
   const retry=document.createElement('button');

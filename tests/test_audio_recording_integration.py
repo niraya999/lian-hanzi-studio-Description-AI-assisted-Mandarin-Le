@@ -37,7 +37,7 @@ class AudioRecordingIntegration(unittest.TestCase):
         for path in ('./audio-recording-ui.js?v=1', './audio-recording-engine.mjs', './audio-capture.worklet.js', './mp3-encoder.worker.js', './vendor/audio/lamejs.iife.js'):
             self.assertIn(path, SW)
         self.assertRegex(SW, r"lhs-shell-v\d+")
-        self.assertIn('v0.8.11-beta', HTML)
+        self.assertIn('v0.8.12-beta', HTML)
         self.assertIn('id="openLivingBookEngine"', HTML)
         self.assertIn('id="livingBookFrame"', HTML)
         self.assertIn('window.lhsDriveBroker=', HTML)
